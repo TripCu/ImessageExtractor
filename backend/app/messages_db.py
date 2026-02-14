@@ -32,8 +32,9 @@ def open_readonly_connection(path: Path) -> sqlite3.Connection:
 
 
 class MessagesDB:
-    def __init__(self, db_path: Path | None = None) -> None:
-        self.db_path = (db_path or default_chat_db_path()).expanduser().resolve()
+    def __init__(self, db_path: Path | str | None = None) -> None:
+        candidate = Path(db_path) if db_path is not None else default_chat_db_path()
+        self.db_path = candidate.expanduser().resolve()
         if not self.db_path.exists():
             raise FileNotFoundError(f"chat.db not found at {self.db_path}")
 
