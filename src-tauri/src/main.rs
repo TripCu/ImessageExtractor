@@ -105,10 +105,15 @@ fn main() {
         .run(|app_handle, event| {
             if let tauri::RunEvent::Exit = event {
                 let state = app_handle.state::<AppState>();
-                if let Ok(mut guard) = state.child.lock() {
-                    if let Some(mut child) = guard.take() {
-                        let _ = child.kill();
+                let maybe_child = {
+                    match state.child.lock() {
+                        Ok(mut guard) => guard.take(),
+                        Err(_) => None,
                     }
+                };
+
+                if let Some(mut child) = maybe_child {
+                    let _ = child.kill();
                 }
             }
         });
