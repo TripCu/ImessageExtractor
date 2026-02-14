@@ -4,9 +4,18 @@ enum MessageTextDecoder {
     private static let bplistHeader = Data("bplist00".utf8)
     private static let disallowedFragments = [
         "bplist00",
+        "streamtyped",
         "$objects",
         "$archiver",
         "$top",
+        "NSString",
+        "NSMutableString",
+        "NSDictionary",
+        "NSMutableDictionary",
+        "NSArray",
+        "NSMutableArray",
+        "NSNumber",
+        "NSValue",
         "NSMutableAttributedString",
         "NSAttributedString",
         "NSObject",
@@ -30,7 +39,7 @@ enum MessageTextDecoder {
 
         for payload in candidatePayloads(from: data) {
             if let attributed = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSAttributedString.self, from: payload),
-               let text = normalize(attributed.string),
+               let text = cleanedCandidate(attributed.string),
                !text.isEmpty {
                 return text
             }
@@ -40,7 +49,7 @@ enum MessageTextDecoder {
             }
 
             if let attributed = decodeAttributedDocument(data: payload),
-               let text = normalize(attributed.string),
+               let text = cleanedCandidate(attributed.string),
                !text.isEmpty {
                 return text
             }
@@ -149,9 +158,13 @@ enum MessageTextDecoder {
     private static func cleanedCandidate(_ text: String) -> String? {
         guard var value = normalize(text) else { return nil }
         value = repairCommonMojibake(value)
+        value = stripQuotedNoise(value)
 
         let lowered = value.lowercased()
         if disallowedFragments.contains(where: { lowered.contains($0.lowercased()) }) {
+            return nil
+        }
+        if containsFoundationClassToken(value) {
             return nil
         }
 
@@ -168,6 +181,23 @@ enum MessageTextDecoder {
         let controls = value.unicodeScalars.filter { CharacterSet.controlCharacters.contains($0) }.count
         if controls > 0 {
             return nil
+        }
+        return value
+    }
+
+    private static func containsFoundationClassToken(_ value: String) -> Bool {
+        let pattern = #"(\bNS[A-Za-z_]+\b|__kIM[A-Za-z_]+)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return false
+        }
+        let range = NSRange(value.startIndex..<value.endIndex, in: value)
+        return regex.firstMatch(in: value, options: [], range: range) != nil
+    }
+
+    private static func stripQuotedNoise(_ value: String) -> String {
+        if let start = value.firstIndex(of: "“"), let end = value.lastIndex(of: "”"), start < end {
+            let quoted = String(value[value.index(after: start)..<end])
+            return normalize(quoted) ?? value
         }
         return value
     }
