@@ -1,19 +1,16 @@
 import type { ConversationPreview } from "../api";
-import type { MouseEvent } from "react";
 import ConversationRow from "./ConversationRow";
 
 interface SidebarProps {
   conversations: ConversationPreview[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  onContextMenu: (id: string, event: MouseEvent<HTMLButtonElement>) => void;
 }
 
 export default function Sidebar({
   conversations,
   selectedId,
-  onSelect,
-  onContextMenu
+  onSelect
 }: SidebarProps): JSX.Element {
   return (
     <aside className="sidebar flex flex-col">
@@ -27,7 +24,6 @@ export default function Sidebar({
             conversation={conversation}
             selected={selectedId === conversation.id}
             onSelect={onSelect}
-            onContextMenu={onContextMenu}
           />
         ))}
       </div>

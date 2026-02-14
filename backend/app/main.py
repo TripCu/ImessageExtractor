@@ -5,8 +5,7 @@ import os
 import uvicorn
 from fastapi import FastAPI, Query
 
-from .errors import install_error_handlers
-from .exporter import ExportService
+from .errors import InternalServiceError, install_error_handlers
 from .models import ConversationResponse, ConversationsResponse, ExportRequest, ExportResponse, HealthResponse
 from .messages_db import MessagesDB
 
@@ -18,7 +17,6 @@ install_error_handlers(app)
 def load_state() -> None:
     db_path = os.getenv("IMESSAGE_DB_PATH")
     app.state.messages_db = MessagesDB(db_path=db_path) if db_path else MessagesDB()
-    app.state.export_service = ExportService()
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -46,20 +44,8 @@ def get_conversation(
 
 
 @app.post("/conversations/{conversation_id}/export", response_model=ExportResponse)
-def export_conversation(conversation_id: int, request: ExportRequest) -> ExportResponse:
-    messages_db: MessagesDB = app.state.messages_db
-    export_service: ExportService = app.state.export_service
-
-    conversation = messages_db.get_conversation(
-        conversation_id=conversation_id,
-        limit=request.limit or 10000,
-    )
-    result = export_service.export(conversation, request)
-    return ExportResponse(
-        status="ok",
-        output_path=str(result.output_path),
-        message_count=result.message_count,
-    )
+def export_conversation(_: int, __: ExportRequest) -> ExportResponse:
+    raise InternalServiceError("Export service is not yet initialized")
 
 
 if __name__ == "__main__":
