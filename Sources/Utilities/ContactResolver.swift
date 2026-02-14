@@ -60,13 +60,19 @@ final class ContactResolver: ObservableObject {
     nonisolated private static func buildPhoneIndex() async throws -> [String: String] {
         try await Task.detached(priority: .userInitiated) {
             let store = CNContactStore()
-            let fullNameDescriptor = CNContactFormatter.descriptorForRequiredKeys(for: .fullName)
-            let keys: [CNKeyDescriptor] = [fullNameDescriptor, CNContactPhoneNumbersKey as CNKeyDescriptor]
+            let keys: [CNKeyDescriptor] = [
+                CNContactGivenNameKey as CNKeyDescriptor,
+                CNContactMiddleNameKey as CNKeyDescriptor,
+                CNContactFamilyNameKey as CNKeyDescriptor,
+                CNContactNicknameKey as CNKeyDescriptor,
+                CNContactOrganizationNameKey as CNKeyDescriptor,
+                CNContactPhoneNumbersKey as CNKeyDescriptor
+            ]
             let request = CNContactFetchRequest(keysToFetch: keys)
 
             var index: [String: String] = [:]
             try store.enumerateContacts(with: request) { contact, _ in
-                let displayName = CNContactFormatter.string(from: contact, style: .fullName) ?? ""
+                let displayName = displayName(contact)
                 guard !displayName.isEmpty else { return }
 
                 for number in contact.phoneNumbers {
@@ -82,5 +88,19 @@ final class ContactResolver: ObservableObject {
 
     nonisolated private static func normalize(_ value: String) -> String {
         value.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
+    }
+
+    nonisolated private static func displayName(_ contact: CNContact) -> String {
+        let parts = [contact.givenName, contact.middleName, contact.familyName]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        if !parts.isEmpty {
+            return parts.joined(separator: " ")
+        }
+
+        let nickname = contact.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !nickname.isEmpty { return nickname }
+
+        return contact.organizationName.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

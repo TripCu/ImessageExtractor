@@ -14,6 +14,7 @@ struct SchemaProbe {
 
         let chat = try fetchColumns(db: db, table: "chat")
         let message = try fetchColumns(db: db, table: "message")
+        let messageSummaryInfo = try fetchColumns(db: db, table: "message_summary_info")
         let handle = try fetchColumns(db: db, table: "handle")
         let chatHandleJoin = try fetchColumns(db: db, table: "chat_handle_join")
         let chatMessageJoin = try fetchColumns(db: db, table: "chat_message_join")
@@ -27,6 +28,7 @@ struct SchemaProbe {
             tables: tables,
             chatColumns: chat,
             messageColumns: message,
+            messageSummaryInfoColumns: messageSummaryInfo,
             handleColumns: handle,
             chatHandleJoinColumns: chatHandleJoin,
             chatMessageJoinColumns: chatMessageJoin,

@@ -4,7 +4,6 @@ import Foundation
 final class AppState: ObservableObject {
     @Published var setupCompleted: Bool
     @Published var showDiagnostics = false
-    @Published var resolveContactNames = false
     @Published var selectedConversationKey: String?
 
     let defaults = UserDefaults.standard
@@ -25,12 +24,6 @@ final class AppState: ObservableObject {
 
     init() {
         setupCompleted = defaults.bool(forKey: "setupCompleted")
-        if defaults.object(forKey: "resolveContactNames") == nil {
-            resolveContactNames = true
-            defaults.set(true, forKey: "resolveContactNames")
-        } else {
-            resolveContactNames = defaults.bool(forKey: "resolveContactNames")
-        }
         dataStore = MessagesDataStore(diagnostics: diagnosticsStore)
         if !hasValidBundleIdentifier {
             AppLogger.error("Startup", "Missing bundle identifier. Launch from .app bundle for proper permissions.")
@@ -43,11 +36,6 @@ final class AppState: ObservableObject {
     func markSetupCompleted() {
         setupCompleted = true
         defaults.set(true, forKey: "setupCompleted")
-    }
-
-    func setResolveContactNames(_ enabled: Bool) {
-        resolveContactNames = enabled
-        defaults.set(enabled, forKey: "resolveContactNames")
     }
 
     func clearInvalidSelectionIfNeeded() {

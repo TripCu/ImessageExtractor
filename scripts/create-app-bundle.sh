@@ -57,7 +57,7 @@ cat > "$APP_PATH/Contents/Info.plist" <<PLIST
   <key>LSMinimumSystemVersion</key>
   <string>14.0</string>
   <key>NSContactsUsageDescription</key>
-  <string>Resolve participant names from local Contacts when enabled.</string>
+  <string>Resolve participant names from local Contacts.</string>
 </dict>
 </plist>
 PLIST

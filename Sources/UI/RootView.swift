@@ -36,7 +36,7 @@ struct LaunchGuardView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            Text("./scripts/create-app-bundle.sh release\nopen .build/release/MessageExporterApp.app")
+            Text("./scripts/create-app-bundle.sh release\nopen .build/release/MessageExporterApp.app\n# or build/run from MessageExporterApp.xcodeproj in Xcode")
                 .font(.system(.body, design: .monospaced))
                 .textSelection(.enabled)
 

@@ -4,7 +4,6 @@ struct MainShellView: View {
     @EnvironmentObject var appState: AppState
     @State private var search = ""
     @State private var showExport = false
-    @State private var transientStatus = ""
     @State private var resolvedTitles: [String: String] = [:]
 
     private var sortedConversations: [ConversationSummary] {
@@ -28,7 +27,7 @@ struct MainShellView: View {
     var body: some View {
         NavigationSplitView {
             List(selection: $appState.selectedConversationKey) {
-                ForEach(visibleConversations) { convo in
+                ForEach(visibleConversations, id: \.selectionKey) { convo in
                     VStack(alignment: .leading, spacing: 2) {
                         Text(titleForConversation(convo)).lineLimit(1)
                         Text(convo.lastPreview ?? "No preview")
@@ -70,19 +69,12 @@ struct MainShellView: View {
                     Button("Export") { showExport = true }
                         .disabled(appState.selectedConversation == nil)
                 }
-                ToolbarItem(placement: .automatic) {
-                    Toggle("Resolve Contact Names", isOn: Binding(
-                        get: { appState.resolveContactNames },
-                        set: { newValue in
-                            appState.setResolveContactNames(newValue)
-                            Task { await handleContactToggle(newValue) }
-                        }
-                    ))
-                }
             }
         } detail: {
             if let selected = appState.selectedConversation {
-                ConversationDetailView(conversation: selected)
+                ConversationDetailView(conversation: selected) {
+                    showExport = true
+                }
             } else {
                 ContentUnavailableView("Select a Conversation", systemImage: "message")
             }
@@ -110,65 +102,21 @@ struct MainShellView: View {
                     .background(.red.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-                if !transientStatus.isEmpty {
-                    Text(transientStatus)
-                        .font(.caption)
-                        .padding(8)
-                        .background(.gray.opacity(0.12))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                }
             }
             .padding()
         }
         .task { await appState.dataStore.resetAndLoad() }
-        .task(id: appState.resolveContactNames) {
-            await refreshResolvedTitles()
-        }
         .task(id: appState.dataStore.conversations.count) {
             appState.clearInvalidSelectionIfNeeded()
-            if appState.resolveContactNames {
-                await refreshResolvedTitles()
-            }
+            await refreshResolvedTitles()
         }
     }
 
     private func titleForConversation(_ conversation: ConversationSummary) -> String {
-        guard appState.resolveContactNames else {
-            return conversation.title
-        }
         return resolvedTitles[conversation.selectionKey] ?? conversation.title
     }
 
-    private func handleContactToggle(_ enabled: Bool) async {
-        guard enabled else {
-            resolvedTitles = [:]
-            return
-        }
-
-        let status = appState.contactResolver.status()
-        if status == .authorized {
-            await refreshResolvedTitles()
-            return
-        }
-
-        let granted = await appState.contactResolver.requestIfNeeded()
-        if granted {
-            transientStatus = "Contacts access granted."
-            await refreshResolvedTitles()
-            AppLogger.info("Contacts", "Contacts permission granted")
-        } else {
-            appState.setResolveContactNames(false)
-            resolvedTitles = [:]
-            transientStatus = "Contacts permission denied. Falling back to handles."
-            AppLogger.info("Contacts", "Contacts permission denied; using handles")
-        }
-    }
-
     private func refreshResolvedTitles() async {
-        guard appState.resolveContactNames else {
-            resolvedTitles = [:]
-            return
-        }
         guard appState.contactResolver.status() == .authorized else {
             resolvedTitles = [:]
             return
@@ -190,16 +138,30 @@ struct MainShellView: View {
 struct ConversationDetailView: View {
     @EnvironmentObject var appState: AppState
     let conversation: ConversationSummary
+    let onExport: () -> Void
 
     @State private var isLoading = false
     @State private var messages: [MessageItem] = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(conversation.title).font(.title3).bold()
-            Text("Participants: \(participantsSummary)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(conversation.title).font(.title3).bold()
+                    Text("Participants: \(participantsSummary)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button(action: onExport) {
+                    Label("Export Conversation", systemImage: "square.and.arrow.up")
+                        .font(.headline)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+            }
 
             if isLoading {
                 ProgressView("Loading messages...")
@@ -212,11 +174,11 @@ struct ConversationDetailView: View {
                                 Text("\(message.isFromMe ? "Me" : (message.sender ?? "Unknown")) • \(Self.timeFormatter.string(from: message.date))")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
-                                Text(message.text ?? "[No text]")
+                                Text(message.renderedText)
                                     .textSelection(.enabled)
                             }
                             .padding(8)
-                            .background(.thinMaterial)
+                            .background(Color(nsColor: .controlBackgroundColor))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                     }

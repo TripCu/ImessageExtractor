@@ -27,6 +27,17 @@ struct MessageItem: Identifiable, Hashable, Codable, Sendable {
     let text: String?
     let attributedBodyBase64: String?
     let attachments: [AttachmentMetadata]
+
+    var renderedText: String {
+        if let value = MessageTextDecoder.preferredText(text: text, attributedBodyBase64: attributedBodyBase64),
+           !value.isEmpty {
+            return value
+        }
+        if !attachments.isEmpty {
+            return "[Attachment]"
+        }
+        return "[No text body]"
+    }
 }
 
 struct AttachmentMetadata: Codable, Hashable, Sendable {
@@ -48,6 +59,7 @@ struct SchemaProbeResult: Sendable {
     let tables: Set<String>
     let chatColumns: Set<String>
     let messageColumns: Set<String>
+    let messageSummaryInfoColumns: Set<String>
     let handleColumns: Set<String>
     let chatHandleJoinColumns: Set<String>
     let chatMessageJoinColumns: Set<String>

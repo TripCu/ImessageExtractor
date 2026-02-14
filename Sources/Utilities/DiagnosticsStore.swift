@@ -49,6 +49,7 @@ final class DiagnosticsStore: ObservableObject {
         let tables = schemaResult?.tables.sorted().joined(separator: ", ") ?? "n/a"
         let chatColumns = schemaResult?.chatColumns.sorted().joined(separator: ", ") ?? "n/a"
         let messageColumns = schemaResult?.messageColumns.sorted().joined(separator: ", ") ?? "n/a"
+        let messageSummaryColumns = schemaResult?.messageSummaryInfoColumns.sorted().joined(separator: ", ") ?? "n/a"
         let handleColumns = schemaResult?.handleColumns.sorted().joined(separator: ", ") ?? "n/a"
 
         return """
@@ -66,6 +67,7 @@ final class DiagnosticsStore: ObservableObject {
         Schema Tables: \(tables)
         Schema chat columns: \(chatColumns)
         Schema message columns: \(messageColumns)
+        Schema message_summary_info columns: \(messageSummaryColumns)
         Schema handle columns: \(handleColumns)
         Schema Missing: \(schemaMissing)
         """

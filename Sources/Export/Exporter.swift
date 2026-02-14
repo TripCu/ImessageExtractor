@@ -27,7 +27,7 @@ final class Exporter {
         let lines = bundle.messages.map { msg in
             let ts = ISO8601DateFormatter().string(from: msg.date)
             let sender = msg.isFromMe ? "Me" : (msg.sender ?? "Unknown")
-            return "[\(ts)] \(sender): \(msg.text ?? "")"
+            return "[\(ts)] \(sender): \(msg.renderedText)"
         }
         try writeSecure(data: lines.joined(separator: "\n").data(using: .utf8) ?? Data(), to: url)
     }
@@ -154,7 +154,7 @@ final class Exporter {
         sqlite3_bind_text(stmt, 2, conversationID, -1, SQLITE_TRANSIENT)
         sqlite3_bind_text(stmt, 3, message.sender ?? "", -1, SQLITE_TRANSIENT)
         sqlite3_bind_double(stmt, 4, message.date.timeIntervalSince1970)
-        sqlite3_bind_text(stmt, 5, message.text ?? "", -1, SQLITE_TRANSIENT)
+        sqlite3_bind_text(stmt, 5, message.renderedText, -1, SQLITE_TRANSIENT)
         sqlite3_bind_text(stmt, 6, message.attributedBodyBase64 ?? "", -1, SQLITE_TRANSIENT)
         sqlite3_bind_int(stmt, 7, message.isFromMe ? 1 : 0)
 

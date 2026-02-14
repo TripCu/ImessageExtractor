@@ -44,7 +44,7 @@ struct ExportView: View {
 
         let messages = await appState.dataStore.messages(for: conversation)
         let displayNames: [String]
-        if appState.resolveContactNames, appState.contactResolver.status() == .authorized {
+        if appState.contactResolver.status() == .authorized {
             displayNames = conversation.participantHandles.map { appState.contactResolver.resolve(handle: $0) }
         } else {
             displayNames = conversation.participantHandles
@@ -91,7 +91,7 @@ struct ExportView: View {
         let rawTitle = conversation.title.trimmingCharacters(in: .whitespacesAndNewlines)
         let base = sanitizeFilename(rawTitle.isEmpty ? "conversation" : rawTitle)
         let ts = Self.timestampFormatter.string(from: Date())
-        return "message_export_\(base)_\(ts).\(extensionForFormat(format))"
+        return "conversation-export-\(base)-\(ts).\(extensionForFormat(format))"
     }
 
     private func sanitizeFilename(_ input: String) -> String {

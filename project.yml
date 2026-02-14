@@ -38,7 +38,7 @@ targets:
         SWIFT_VERSION: 5.9
         INFOPLIST_KEY_CFBundleDisplayName: MessageExporter
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
-        INFOPLIST_KEY_NSContactsUsageDescription: Resolve participant names from local Contacts when enabled.
+        INFOPLIST_KEY_NSContactsUsageDescription: Resolve participant names from local Contacts.
         INFOPLIST_KEY_NSSystemAdministrationUsageDescription: Full Disk Access may be needed to read Messages data.
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: ""

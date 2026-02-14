@@ -230,6 +230,18 @@ final class MessagesDataStore: ObservableObject {
             senderSelect = "NULL"
             senderJoin = ""
         }
+        let summaryTextColumn = summaryTextColumnName(probe: probe)
+        let summaryJoin: String
+        let summarySelect: String
+        if let summaryTextColumn,
+           probe.tables.contains("message_summary_info"),
+           probe.messageSummaryInfoColumns.contains("message_id") {
+            summaryJoin = "LEFT JOIN message_summary_info msi ON msi.message_id = m.ROWID"
+            summarySelect = "msi.\(summaryTextColumn)"
+        } else {
+            summaryJoin = ""
+            summarySelect = "NULL"
+        }
         let attributedSelect = probe.messageColumns.contains("attributedBody") ? "m.attributedBody" : "NULL"
 
         let rows = try db.queryRows(sql: """
@@ -238,12 +250,13 @@ final class MessagesDataStore: ObservableObject {
           m.ROWID AS message_rowid,
           m.date AS date,
           m.is_from_me AS is_from_me,
-          m.text AS text,
+          COALESCE(m.text, \(summarySelect)) AS text,
           \(attributedSelect) AS attributed_body,
           \(senderSelect) AS sender
         FROM message m
         JOIN chat_message_join cmj ON cmj.message_id = m.ROWID
         \(senderJoin)
+        \(summaryJoin)
         WHERE cmj.chat_id IN (\(rowIDList))
         ORDER BY m.date ASC, m.ROWID ASC
         ;
@@ -259,6 +272,10 @@ final class MessagesDataStore: ObservableObject {
             case let .blob(data): attributed = data.base64EncodedString()
             default: attributed = nil
             }
+            let preferredText = MessageTextDecoder.preferredText(
+                text: row["text"]?.string,
+                attributedBodyBase64: attributed
+            )
 
             result.append(MessageItem(
                 id: row["id"]?.string ?? UUID().uuidString,
@@ -266,7 +283,7 @@ final class MessagesDataStore: ObservableObject {
                 date: AppleDateConverter.convert(raw: row["date"]?.int64) ?? Date.distantPast,
                 sender: row["sender"]?.string,
                 isFromMe: (row["is_from_me"]?.int64 ?? 0) > 0,
-                text: row["text"]?.string,
+                text: preferredText,
                 attributedBodyBase64: attributed,
                 attachments: attachments
             ))
@@ -318,6 +335,13 @@ final class MessagesDataStore: ObservableObject {
         return false
         #endif
     }
+
+    nonisolated fileprivate static func summaryTextColumnName(probe: SchemaProbeResult) -> String? {
+        for candidate in ["text", "summary"] where probe.messageSummaryInfoColumns.contains(candidate) {
+            return candidate
+        }
+        return nil
+    }
 }
 
 enum QueryBuilder {
@@ -325,10 +349,22 @@ enum QueryBuilder {
         let displayColumn = probe.chatColumns.contains("display_name") ? "COALESCE(c.display_name, '')" : "''"
         let guidColumn = probe.chatColumns.contains("guid") ? "COALESCE(c.guid, CAST(c.ROWID AS TEXT))" : "CAST(c.ROWID AS TEXT)"
         let lastDateColumn = probe.messageColumns.contains("date") ? "MAX(m.date)" : "0"
+        let summaryTextColumn = MessagesDataStore.summaryTextColumnName(probe: probe)
+        let summaryJoin: String
+        if summaryTextColumn != nil, probe.tables.contains("message_summary_info"), probe.messageSummaryInfoColumns.contains("message_id") {
+            summaryJoin = "LEFT JOIN message_summary_info msi ON msi.message_id = m.ROWID"
+        } else {
+            summaryJoin = ""
+        }
+        let summaryValueExpr = summaryTextColumn.map { "msi.\($0)" } ?? "NULL"
 
         let previewColumn: String
-        if probe.messageColumns.contains("text") {
+        if probe.messageColumns.contains("text"), summaryTextColumn != nil {
+            previewColumn = "MAX(COALESCE(m.text, \(summaryValueExpr), ''))"
+        } else if probe.messageColumns.contains("text") {
             previewColumn = "MAX(COALESCE(m.text, ''))"
+        } else if summaryTextColumn != nil {
+            previewColumn = "MAX(COALESCE(\(summaryValueExpr), ''))"
         } else if probe.messageColumns.contains("attributedBody") {
             previewColumn = "MAX(CASE WHEN m.attributedBody IS NULL THEN '' ELSE '[Attributed Message]' END)"
         } else {
@@ -359,6 +395,7 @@ enum QueryBuilder {
         FROM chat c
         LEFT JOIN chat_message_join cmj ON cmj.chat_id = c.ROWID
         LEFT JOIN message m ON m.ROWID = cmj.message_id
+        \(summaryJoin)
         \(groupJoin)
         GROUP BY c.ROWID
         ORDER BY last_date DESC

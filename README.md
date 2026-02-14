@@ -46,6 +46,17 @@ cd /Users/trip/ImessageExtractor
 swift build
 ```
 
+## Build in Xcode
+```bash
+cd /Users/trip/ImessageExtractor
+open MessageExporterApp.xcodeproj
+```
+
+In Xcode:
+1. Select scheme `MessageExporterApp`.
+2. Select destination `My Mac`.
+3. Press `Run`.
+
 ## Run (Important)
 Do not use `swift run` for normal usage because it launches without a macOS app bundle identifier and breaks permissions flow.
 
@@ -92,11 +103,10 @@ cd /Users/trip/ImessageExtractor
 
 ## Troubleshooting
 ### Full Disk Access required
-1. Open `System Settings`.
-2. Go to `Privacy & Security`.
-3. Open `Full Disk Access`.
-4. Enable MessageExporter.
-5. Return to app and click `Retry` in setup wizard.
+1. Launch the app.
+2. On first-run wizard, click `Grant Full Disk Access`.
+3. Enable MessageExporter in `System Settings → Privacy & Security → Full Disk Access`.
+4. Return to app and click `Retry`.
 
 ### Missing `chat.db`
 - Expected path: `/Users/<you>/Library/Messages/chat.db`
@@ -108,8 +118,8 @@ cd /Users/trip/ImessageExtractor
 - Open a GitHub issue with the sanitized report.
 
 ### Contacts denied
-- App falls back to raw handles automatically.
-- Enable contact resolution only if you want display-name enrichment.
+- On first-run wizard, click `Grant Contacts Access`.
+- If denied, the app falls back to handles until access is granted.
 
 ## Project Layout
 ```text
