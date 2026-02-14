@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
 
-import { exportConversation, listConversations, setApiConfig } from "./api";
+import { exportConversation, listConversations } from "./api";
 import type { ConversationPreview, ExportFormat, ExportRequest } from "./api";
 import Toolbar from "./components/Toolbar";
 import Sidebar from "./components/Sidebar";
@@ -87,51 +87,12 @@ export default function App(): JSX.Element {
   const [exportError, setExportError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState<ExportStatus | null>(null);
-  const [sessionReady, setSessionReady] = useState(false);
 
   const selectedConversation = useMemo(() => {
     return conversations.find((conversation) => conversation.id === selectedId) ?? null;
   }, [conversations, selectedId]);
 
   useEffect(() => {
-    let active = true;
-
-    const configureSession = async (): Promise<void> => {
-      try {
-        const tauriCore = await import("@tauri-apps/api/core");
-        const session = await tauriCore.invoke<{ base_url: string; token: string }>("session_config");
-        if (!active) {
-          return;
-        }
-        setApiConfig({
-          baseUrl: session.base_url,
-          token: session.token
-        });
-      } catch {
-        const envToken = import.meta.env.VITE_API_TOKEN as string | undefined;
-        const envBaseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
-        setApiConfig({
-          token: envToken ?? "",
-          baseUrl: envBaseUrl ?? "http://127.0.0.1:8765"
-        });
-      } finally {
-        if (active) {
-          setSessionReady(true);
-        }
-      }
-    };
-
-    void configureSession();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!sessionReady) {
-      return;
-    }
     let active = true;
     const timer = window.setTimeout(async () => {
       setLoadingConversations(true);
@@ -159,7 +120,7 @@ export default function App(): JSX.Element {
       active = false;
       window.clearTimeout(timer);
     };
-  }, [search, sessionReady]);
+  }, [search]);
 
   useEffect(() => {
     if (!conversations.some((conversation) => conversation.id === selectedId)) {
