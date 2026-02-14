@@ -80,7 +80,8 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 
   const response = await fetch(`${apiConfig.baseUrl}${path}`, {
     ...init,
-    headers
+    headers,
+    cache: "no-store"
   });
 
   if (!response.ok) {
