@@ -1,20 +1,24 @@
 import type { ConversationPreview } from "../api";
+import type { MouseEvent } from "react";
 
 interface ConversationRowProps {
   conversation: ConversationPreview;
   selected: boolean;
   onSelect: (id: string) => void;
+  onContextMenu: (id: string, event: MouseEvent<HTMLButtonElement>) => void;
 }
 
 export default function ConversationRow({
   conversation,
   selected,
-  onSelect
+  onSelect,
+  onContextMenu
 }: ConversationRowProps): JSX.Element {
   return (
     <button
       type="button"
       onClick={() => onSelect(conversation.id)}
+      onContextMenu={(event) => onContextMenu(conversation.id, event)}
       className={`w-full rounded-[var(--radius-selection)] px-3 py-2 text-left transition-colors ${
         selected ? "bg-[var(--bg-selected)]" : "hover:bg-black/5 dark:hover:bg-white/5"
       }`}
