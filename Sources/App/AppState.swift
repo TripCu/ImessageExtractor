@@ -26,6 +26,9 @@ final class AppState: ObservableObject {
             resolveContactNames = defaults.bool(forKey: "resolveContactNames")
         }
         dataStore = MessagesDataStore(diagnostics: diagnosticsStore)
+        if Bundle.main.bundleIdentifier == nil {
+            AppLogger.error("Startup", "Missing bundle identifier. Launch from .app bundle for proper permissions.")
+        }
         AppLogger.info("Startup", "App state initialized")
     }
 

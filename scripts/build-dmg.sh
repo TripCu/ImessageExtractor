@@ -7,8 +7,8 @@ APP_PATH="$BUILD_DIR/$APP_NAME.app"
 DMG_PATH="$BUILD_DIR/$APP_NAME.dmg"
 
 if [[ ! -d "$APP_PATH" ]]; then
-  echo "Expected app bundle at $APP_PATH"
-  exit 1
+  echo "App bundle not found at $APP_PATH, creating it..."
+  ./scripts/create-app-bundle.sh release
 fi
 
 TMP_DIR=$(mktemp -d)

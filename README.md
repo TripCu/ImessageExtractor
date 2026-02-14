@@ -59,10 +59,13 @@ xcodebuild -project MessageExporterApp.xcodeproj -scheme MessageExporterApp -des
 ## Packaging DMG
 ```bash
 cd /Users/trip/ImessageExtractor
-swift build -c release
-mkdir -p .build/release/MessageExporterApp.app/Contents/MacOS
-cp .build/release/MessageExporterApp .build/release/MessageExporterApp.app/Contents/MacOS/MessageExporterApp
+./scripts/create-app-bundle.sh release
 ./scripts/build-dmg.sh
+```
+
+Run the generated app bundle directly (recommended):
+```bash
+open /Users/trip/ImessageExtractor/.build/release/MessageExporterApp.app
 ```
 
 ## Repro and Diagnostics Tools

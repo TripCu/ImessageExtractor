@@ -29,9 +29,7 @@ jobs:
       - name: Build (SwiftPM Release)
         run: swift build -c release
       - name: Create app bundle
-        run: |
-          mkdir -p .build/release/MessageExporterApp.app/Contents/MacOS
-          cp .build/release/MessageExporterApp .build/release/MessageExporterApp.app/Contents/MacOS/MessageExporterApp
+        run: ./scripts/create-app-bundle.sh release
       - name: Package DMG
         run: ./scripts/build-dmg.sh
       - name: Upload artifacts
