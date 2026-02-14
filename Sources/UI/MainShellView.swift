@@ -7,33 +7,49 @@ struct MainShellView: View {
     @State private var transientStatus = ""
     @State private var resolvedTitles: [String: String] = [:]
 
-    private var filtered: [ConversationSummary] {
-        if search.isEmpty { return appState.dataStore.conversations }
-        return appState.dataStore.conversations.filter {
-            titleForConversation($0).localizedCaseInsensitiveContains(search)
+    private var sortedConversations: [ConversationSummary] {
+        appState.dataStore.conversations.sorted { lhs, rhs in
+            let lhsDate = lhs.lastDate ?? .distantPast
+            let rhsDate = rhs.lastDate ?? .distantPast
+            if lhsDate != rhsDate { return lhsDate > rhsDate }
+            return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+        }
+    }
+
+    private var visibleConversations: [ConversationSummary] {
+        if search.isEmpty { return sortedConversations }
+        return sortedConversations.filter { conversation in
+            let title = titleForConversation(conversation)
+            if title.localizedCaseInsensitiveContains(search) { return true }
+            return conversation.participantHandles.contains { $0.localizedCaseInsensitiveContains(search) }
         }
     }
 
     var body: some View {
         NavigationSplitView {
-            List(filtered, selection: $appState.selectedConversation) { convo in
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(titleForConversation(convo)).lineLimit(1)
-                    Text(convo.lastPreview ?? "No preview")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-                .contentShape(Rectangle())
-                .contextMenu {
-                    Button("Export Conversation") {
-                        appState.selectedConversation = convo
-                        showExport = true
+            List(selection: $appState.selectedConversationID) {
+                ForEach(visibleConversations) { convo in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(titleForConversation(convo)).lineLimit(1)
+                        Text(sidebarPreview(for: convo))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
                     }
-                }
-                .onAppear {
-                    if convo.id == appState.dataStore.conversations.last?.id {
-                        Task { await appState.dataStore.loadMore() }
+                    .contentShape(Rectangle())
+                    .tag(convo.id as String?)
+                    .contextMenu {
+                        Button("Export Conversation") {
+                            appState.selectedConversationID = convo.id
+                            showExport = true
+                        }
+                    }
+                    .onAppear {
+                        if search.isEmpty,
+                           convo.id == visibleConversations.last?.id,
+                           appState.dataStore.canLoadMore {
+                            Task { await appState.dataStore.loadMore() }
+                        }
                     }
                 }
             }
@@ -52,16 +68,19 @@ struct MainShellView: View {
                         .disabled(appState.selectedConversation == nil)
                 }
                 ToolbarItem(placement: .automatic) {
-                    Menu("View") {
-                        Toggle("Privacy Mode", isOn: $appState.privacyModeEnabled)
-                        Toggle("Resolve Contact Names", isOn: Binding(
-                            get: { appState.resolveContactNames },
-                            set: { newValue in
-                                appState.setResolveContactNames(newValue)
-                                Task { await handleContactToggle(newValue) }
-                            }
-                        ))
+                    Toggle(isOn: $appState.privacyModeEnabled) {
+                        Label("Privacy Mode", systemImage: appState.privacyModeEnabled ? "eye.slash" : "eye")
                     }
+                    .toggleStyle(.switch)
+                }
+                ToolbarItem(placement: .automatic) {
+                    Toggle("Resolve Contact Names", isOn: Binding(
+                        get: { appState.resolveContactNames },
+                        set: { newValue in
+                            appState.setResolveContactNames(newValue)
+                            Task { await handleContactToggle(newValue) }
+                        }
+                    ))
                 }
             }
         } detail: {
@@ -101,18 +120,26 @@ struct MainShellView: View {
                         .background(.gray.opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-        }
-        .padding()
+            }
+            .padding()
         }
         .task { await appState.dataStore.resetAndLoad() }
         .task(id: appState.resolveContactNames) {
             await refreshResolvedTitles()
         }
         .task(id: appState.dataStore.conversations.count) {
+            appState.clearInvalidSelectionIfNeeded()
             if appState.resolveContactNames {
                 await refreshResolvedTitles()
             }
         }
+    }
+
+    private func sidebarPreview(for conversation: ConversationSummary) -> String {
+        if appState.privacyModeEnabled {
+            return "Privacy Mode enabled"
+        }
+        return conversation.lastPreview ?? "No preview"
     }
 
     private func titleForConversation(_ conversation: ConversationSummary) -> String {
@@ -127,11 +154,13 @@ struct MainShellView: View {
             resolvedTitles = [:]
             return
         }
+
         let status = appState.contactResolver.status()
         if status == .authorized {
             await refreshResolvedTitles()
             return
         }
+
         let granted = await appState.contactResolver.requestIfNeeded()
         if granted {
             transientStatus = "Contacts access granted."
@@ -172,6 +201,9 @@ struct ConversationDetailView: View {
     @EnvironmentObject var appState: AppState
     let conversation: ConversationSummary
 
+    @State private var isLoading = false
+    @State private var messages: [MessageItem] = []
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(conversation.title).font(.title3).bold()
@@ -180,16 +212,47 @@ struct ConversationDetailView: View {
                 .foregroundStyle(.secondary)
 
             if appState.privacyModeEnabled {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(.regularMaterial)
-                    .overlay(Text("Privacy Mode: content hidden"))
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(0..<10, id: \.self) { _ in
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(.regularMaterial)
+                            .frame(height: 20)
+                    }
+                }
+                .padding(.top, 10)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            } else if isLoading {
+                ProgressView("Loading messages...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                Text("Select Export to generate transcript files for this conversation.")
-                Spacer()
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        ForEach(messages) { message in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("\(message.isFromMe ? "Me" : (message.sender ?? "Unknown")) • \(Self.timeFormatter.string(from: message.date))")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text(message.text ?? "[No text]")
+                                    .textSelection(.enabled)
+                            }
+                            .padding(8)
+                            .background(.thinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                }
             }
         }
         .padding()
+        .task(id: conversation.id) {
+            await loadMessages()
+        }
+    }
+
+    private func loadMessages() async {
+        isLoading = true
+        defer { isLoading = false }
+        messages = await appState.dataStore.messages(for: conversation)
     }
 
     private var participantsSummary: String {
@@ -198,4 +261,11 @@ struct ConversationDetailView: View {
         }
         return conversation.participantHandles.prefix(5).joined(separator: ", ")
     }
+
+    private static let timeFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateStyle = .medium
+        df.timeStyle = .short
+        return df
+    }()
 }
