@@ -6,6 +6,7 @@ import os
 import shutil
 import sqlite3
 import stat
+import tempfile
 import threading
 from dataclasses import dataclass
 from pathlib import Path
@@ -77,12 +78,34 @@ class ExportService:
         parent = destination.parent
         if not parent.exists() or not parent.is_dir():
             raise InvalidRequestError("Destination directory does not exist")
+        if not os.access(parent, os.W_OK | os.X_OK):
+            raise InvalidRequestError("Destination directory is not writable")
+        if destination.exists() and destination.is_dir():
+            raise InvalidRequestError("Destination path points to a directory")
         if destination.exists() and destination.is_symlink():
             raise InvalidRequestError("Symbolic links are not allowed for destination files")
+        if self._contains_symlink(parent):
+            raise InvalidRequestError("Symbolic links are not allowed in destination directory path")
         if destination.exists() and not overwrite:
             raise InvalidRequestError("Destination file already exists and overwrite is disabled")
+        if not self._is_allowed_destination(destination):
+            raise InvalidRequestError("Destination path is outside allowed export roots")
 
         return destination
+
+    def _contains_symlink(self, path: Path) -> bool:
+        current = path
+        while True:
+            if current.is_symlink():
+                return True
+            if current.parent == current:
+                break
+            current = current.parent
+        return False
+
+    def _is_allowed_destination(self, path: Path) -> bool:
+        allowed_roots = [Path.home().resolve(), Path("/tmp").resolve(), Path(tempfile.gettempdir()).resolve()]
+        return any(path.is_relative_to(root) for root in allowed_roots)
 
     def _prepare_thread_data(
         self,

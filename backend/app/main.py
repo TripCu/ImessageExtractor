@@ -35,12 +35,21 @@ def load_state() -> None:
 async def require_bearer_token(request: Request, call_next):
     expected_token: str = app.state.api_token
     if not is_token_authorized(request.headers.get("Authorization"), expected_token):
-        return JSONResponse(
+        response = JSONResponse(
             status_code=401,
             content={"error": {"code": "unauthorized", "detail": "Unauthorized"}},
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return await call_next(request)
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
+
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    return response
 
 
 @app.get("/health", response_model=HealthResponse)

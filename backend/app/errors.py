@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 
@@ -34,6 +35,18 @@ class InternalServiceError(AppError):
 
 
 def install_error_handlers(app: FastAPI) -> None:
+    @app.exception_handler(RequestValidationError)
+    async def validation_error_handler(_: Request, __: RequestValidationError) -> JSONResponse:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "error": {
+                    "code": "invalid_request",
+                    "detail": "Request validation failed.",
+                }
+            },
+        )
+
     @app.exception_handler(AppError)
     async def app_error_handler(_: Request, exc: AppError) -> JSONResponse:
         return JSONResponse(

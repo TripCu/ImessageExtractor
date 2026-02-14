@@ -35,8 +35,14 @@ class MessagesDB:
     def __init__(self, db_path: Path | str | None = None) -> None:
         candidate = Path(db_path) if db_path is not None else default_chat_db_path()
         self.db_path = candidate.expanduser().resolve()
+        if not self.db_path.is_absolute():
+            raise FileNotFoundError("chat.db path must be absolute")
         if not self.db_path.exists():
             raise FileNotFoundError(f"chat.db not found at {self.db_path}")
+        if self.db_path.is_symlink():
+            raise FileNotFoundError("chat.db path cannot be a symlink")
+        if not self.db_path.is_file():
+            raise FileNotFoundError("chat.db path must point to a file")
 
     def _connect(self) -> sqlite3.Connection:
         connection = open_readonly_connection(self.db_path)
