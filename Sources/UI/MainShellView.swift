@@ -5,6 +5,7 @@ struct MainShellView: View {
     @State private var search = ""
     @State private var showExport = false
     @State private var transientStatus = ""
+    @State private var resolvedTitles: [String: String] = [:]
 
     private var filtered: [ConversationSummary] {
         if search.isEmpty { return appState.dataStore.conversations }
@@ -100,33 +101,70 @@ struct MainShellView: View {
                         .background(.gray.opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
-            }
-            .padding()
+        }
+        .padding()
         }
         .task { await appState.dataStore.resetAndLoad() }
+        .task(id: appState.resolveContactNames) {
+            await refreshResolvedTitles()
+        }
+        .task(id: appState.dataStore.conversations.count) {
+            if appState.resolveContactNames {
+                await refreshResolvedTitles()
+            }
+        }
     }
 
     private func titleForConversation(_ conversation: ConversationSummary) -> String {
-        guard appState.resolveContactNames, appState.contactResolver.status() == .authorized else {
+        guard appState.resolveContactNames else {
             return conversation.title
         }
-        let resolved = conversation.participantHandles.map { appState.contactResolver.resolve(handle: $0) }
-        if resolved.isEmpty { return conversation.title }
-        return resolved.prefix(3).joined(separator: ", ")
+        return resolvedTitles[conversation.id] ?? conversation.title
     }
 
     private func handleContactToggle(_ enabled: Bool) async {
-        guard enabled else { return }
+        guard enabled else {
+            resolvedTitles = [:]
+            return
+        }
         let status = appState.contactResolver.status()
-        if status == .authorized { return }
+        if status == .authorized {
+            await refreshResolvedTitles()
+            return
+        }
         let granted = await appState.contactResolver.requestIfNeeded()
-        if !granted {
+        if granted {
+            transientStatus = "Contacts access granted."
+            await refreshResolvedTitles()
+            AppLogger.info("Contacts", "Contacts permission granted")
+        } else {
+            appState.setResolveContactNames(false)
+            resolvedTitles = [:]
             transientStatus = "Contacts permission denied. Falling back to handles."
             AppLogger.info("Contacts", "Contacts permission denied; using handles")
-        } else {
-            transientStatus = "Contacts access granted."
-            AppLogger.info("Contacts", "Contacts permission granted")
         }
+    }
+
+    private func refreshResolvedTitles() async {
+        guard appState.resolveContactNames else {
+            resolvedTitles = [:]
+            return
+        }
+        guard appState.contactResolver.status() == .authorized else {
+            resolvedTitles = [:]
+            return
+        }
+
+        await appState.contactResolver.prepareIndexIfNeeded()
+
+        var map: [String: String] = [:]
+        for conversation in appState.dataStore.conversations {
+            let resolved = conversation.participantHandles.map { appState.contactResolver.resolve(handle: $0) }
+            if !resolved.isEmpty {
+                map[conversation.id] = resolved.prefix(3).joined(separator: ", ")
+            }
+        }
+        resolvedTitles = map
     }
 }
 

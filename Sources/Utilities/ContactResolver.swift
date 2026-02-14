@@ -6,12 +6,15 @@ final class ContactResolver: ObservableObject {
     private var cache: [String: String] = [:]
     private var phoneIndex: [String: String] = [:]
     private var didBuildIndex = false
-    private let store = CNContactStore()
+    private var isBuildingIndex = false
 
-    func status() -> CNAuthorizationStatus { CNContactStore.authorizationStatus(for: .contacts) }
+    func status() -> CNAuthorizationStatus {
+        CNContactStore.authorizationStatus(for: .contacts)
+    }
 
     func requestIfNeeded() async -> Bool {
         if status() == .authorized { return true }
+        let store = CNContactStore()
         return await withCheckedContinuation { continuation in
             store.requestAccess(for: .contacts) { granted, _ in
                 continuation.resume(returning: granted)
@@ -19,12 +22,29 @@ final class ContactResolver: ObservableObject {
         }
     }
 
+    func prepareIndexIfNeeded() async {
+        guard status() == .authorized else { return }
+        guard !didBuildIndex, !isBuildingIndex else { return }
+
+        isBuildingIndex = true
+        defer { isBuildingIndex = false }
+
+        do {
+            let index = try await Self.buildPhoneIndex()
+            phoneIndex = index
+            didBuildIndex = true
+            AppLogger.info("Contacts", "Contact index prepared")
+        } catch {
+            didBuildIndex = false
+            AppLogger.error("Contacts", "Failed preparing contact index")
+        }
+    }
+
     func resolve(handle: String) -> String {
         if let cached = cache[handle] { return cached }
-        guard status() == .authorized else { return handle }
+        guard status() == .authorized, didBuildIndex else { return handle }
 
-        buildIndexIfNeeded()
-        let normalized = normalize(handle)
+        let normalized = Self.normalize(handle)
         let suffix8 = String(normalized.suffix(8))
 
         if let direct = phoneIndex[normalized] {
@@ -37,30 +57,30 @@ final class ContactResolver: ObservableObject {
         return cache[handle] ?? handle
     }
 
-    private func buildIndexIfNeeded() {
-        guard !didBuildIndex else { return }
-        didBuildIndex = true
+    nonisolated private static func buildPhoneIndex() async throws -> [String: String] {
+        try await Task.detached(priority: .userInitiated) {
+            let store = CNContactStore()
+            let fullNameDescriptor = CNContactFormatter.descriptorForRequiredKeys(for: .fullName)
+            let keys: [CNKeyDescriptor] = [fullNameDescriptor, CNContactPhoneNumbersKey as CNKeyDescriptor]
+            let request = CNContactFetchRequest(keysToFetch: keys)
 
-        let keys = [
-            CNContactGivenNameKey,
-            CNContactFamilyNameKey,
-            CNContactPhoneNumbersKey
-        ] as [CNKeyDescriptor]
+            var index: [String: String] = [:]
+            try store.enumerateContacts(with: request) { contact, _ in
+                let displayName = CNContactFormatter.string(from: contact, style: .fullName) ?? ""
+                guard !displayName.isEmpty else { return }
 
-        let request = CNContactFetchRequest(keysToFetch: keys)
-        try? store.enumerateContacts(with: request) { contact, _ in
-            let displayName = CNContactFormatter.string(from: contact, style: .fullName) ?? ""
-            guard !displayName.isEmpty else { return }
-            for number in contact.phoneNumbers {
-                let digits = normalize(number.value.stringValue)
-                if !digits.isEmpty {
-                    phoneIndex[digits] = displayName
+                for number in contact.phoneNumbers {
+                    let digits = normalize(number.value.stringValue)
+                    if !digits.isEmpty {
+                        index[digits] = displayName
+                    }
                 }
             }
-        }
+            return index
+        }.value
     }
 
-    private func normalize(_ value: String) -> String {
+    nonisolated private static func normalize(_ value: String) -> String {
         value.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
     }
 }
