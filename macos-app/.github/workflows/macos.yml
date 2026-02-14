@@ -1,0 +1,41 @@
+name: macOS Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-test-package:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: macos-app
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set commit hash
+        run: echo "GIT_COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Build
+        run: swift build -c release
+      - name: Test
+        run: swift test
+      - name: Create app bundle
+        run: |
+          mkdir -p .build/release/MessageExporterApp.app/Contents/MacOS
+          cp .build/release/MessageExporterApp .build/release/MessageExporterApp.app/Contents/MacOS/MessageExporterApp
+      - name: Package DMG
+        run: ./scripts/build-dmg.sh
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MessageExporter-macos
+          path: |
+            macos-app/.build/release/MessageExporterApp
+            macos-app/.build/release/MessageExporterApp.dmg
+
+  sign-notarize:
+    if: ${{ secrets.APPLE_CERT_BASE64 != '' && secrets.APPLE_API_KEY != '' }}
+    runs-on: macos-latest
+    needs: build-test-package
+    steps:
+      - run: echo "Signing/notarization is configured only when secrets are provided."

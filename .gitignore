@@ -47,3 +47,15 @@ src-tauri/gen/
 exports/
 *.imexport
 *.token
+
+# Swift / Xcode
+DerivedData/
+.build/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Signing / notarization
+*.p12
+*.mobileprovision
+AuthKey_*.p8
