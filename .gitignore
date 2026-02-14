@@ -51,6 +51,7 @@ exports/
 # Swift / Xcode
 DerivedData/
 .build/
+.swiftpm/
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
 *.xcodeproj/project.xcworkspace/xcuserdata/

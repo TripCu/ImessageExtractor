@@ -1,42 +1,62 @@
-# MessageExporterApp
+# MessageExporter
 
-A native macOS Swift app that feels like a Messages-style client, focused on secure conversation export.
+MessageExporter is a native macOS app (SwiftUI) designed to feel like a Messages-style client where the primary action is exporting conversations.
 
 ## Disclaimer
 - Not affiliated with Apple.
 - Messages and iMessage are trademarks of Apple Inc.
 
-## Platform
+## Platform and Distribution
 - macOS 14.0+
-- Outside Mac App Store distribution
-- App Sandbox disabled for release builds intended to read `chat.db`
+- Distributed outside the Mac App Store
+- App Sandbox disabled (required for local `chat.db` access)
+- Hardened Runtime enabled for Release builds
 
-## Features
-- Messages-like split UI with sidebar, toolbar, detail pane.
-- Blocking first-run setup wizard with retry.
-- Diagnostics panel with sanitized report + copy.
-- Exports: text, JSON, SQLite, optional encrypted `.imexport`.
-- Schema probing with query adaptation.
-- Debug-only synthetic DB switch for deterministic reproduction.
+## Core Features
+- Messages-like split UI: sidebar, toolbar, conversation list, detail pane
+- Blocking first-run setup wizard with retry
+- Diagnostics panel with sanitized report and sanitized debug log export
+- Real read-only data access from `~/Library/Messages/chat.db`
+- Exports:
+  - Text transcript (`.txt`)
+  - JSON (`.json`)
+  - SQLite (`.sqlite`)
+  - Encrypted package (`.imexport`, AES-256-GCM + scrypt)
+- Debug-only synthetic DB switch for deterministic reproduction
+
+## Security Model
+### Threat model
+- Local message database contains sensitive personal data.
+- Primary risk is accidental disclosure during logs, diagnostics, or exports.
+
+### Controls
+- Read-only open of Messages DB (`SQLITE_OPEN_READONLY`).
+- No telemetry, analytics, or outbound network calls.
+- Sensitive values redacted in diagnostics (`/Users/<redacted>/...`).
+- Debug logging is sanitized and excludes message bodies/full handles.
+- Release logging is minimal.
+- Exports only through explicit user-selected `NSSavePanel` destination.
+- Overwrite is disabled by default.
+- Export files are written with restrictive permissions (`0600`).
+- Passphrases are never persisted.
 
 ## Build
 ```bash
 cd /Users/trip/ImessageExtractor
 swift build
-swift test
 ```
 
-## Xcode Project
+## Run Tests
+`XCTest` is the required framework for this project.
+
+Preferred (full Xcode):
 ```bash
 cd /Users/trip/ImessageExtractor
 xcodegen generate
-open /Users/trip/ImessageExtractor/MessageExporterApp.xcodeproj
+xcodebuild -project MessageExporterApp.xcodeproj -scheme MessageExporterApp -destination 'platform=macOS' test
 ```
-- `Release` configuration has Hardened Runtime enabled.
-- App Sandbox is disabled by entitlements for outside-MAS distribution.
-- Set `DEVELOPMENT_TEAM` in project signing settings before archive/export.
 
-## Packaging
+## Packaging DMG
 ```bash
 cd /Users/trip/ImessageExtractor
 swift build -c release
@@ -45,26 +65,41 @@ cp .build/release/MessageExporterApp .build/release/MessageExporterApp.app/Conte
 ./scripts/build-dmg.sh
 ```
 
+## Repro and Diagnostics Tools
+Generate deterministic synthetic fixture DB:
+```bash
+cd /Users/trip/ImessageExtractor
+./scripts/generate-synthetic-db.sh Resources/synthetic-chat.db
+```
+
+Collect sanitized local diagnostics from terminal (no manual SQL required):
+```bash
+cd /Users/trip/ImessageExtractor
+./scripts/collect-diagnostics.sh
+```
+
 ## Troubleshooting
-- Full Disk Access required:
-  1. Open System Settings.
-  2. Privacy & Security.
-  3. Full Disk Access.
-  4. Enable this app.
-  5. Return and click `Retry` in setup wizard.
-- Missing `chat.db`:
-  - Verify path: `/Users/<you>/Library/Messages/chat.db`.
-- Unsupported schema:
-  - Open Diagnostics, copy report, and include it in a GitHub issue.
-- Contacts denied:
-  - Export still works using handles; grant Contacts access only if name resolution is needed.
+### Full Disk Access required
+1. Open `System Settings`.
+2. Go to `Privacy & Security`.
+3. Open `Full Disk Access`.
+4. Enable MessageExporter.
+5. Return to app and click `Retry` in setup wizard.
 
-## Privacy and Data Handling
-- No telemetry, analytics, or network access.
-- No sample data fallback on failures.
-- Diagnostics include counts only, no message bodies/full handles.
+### Missing `chat.db`
+- Expected path: `/Users/<you>/Library/Messages/chat.db`
+- Verify Messages has been used on this macOS account.
 
-## Repo Layout
+### Unsupported Messages schema
+- Open Diagnostics.
+- Click `Copy Diagnostic Report`.
+- Open a GitHub issue with the sanitized report.
+
+### Contacts denied
+- App falls back to raw handles automatically.
+- Enable contact resolution only if you want display-name enrichment.
+
+## Project Layout
 ```text
 Sources/
   App/
@@ -73,4 +108,7 @@ Sources/
   UI/
   Utilities/
 Tests/
+Config/
+Resources/
+scripts/
 ```

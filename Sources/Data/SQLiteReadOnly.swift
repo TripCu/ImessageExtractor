@@ -28,7 +28,13 @@ final class SQLiteReadOnly {
         let flags = SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX
         let rc = sqlite3_open_v2(path, &handle, flags, nil)
         guard rc == SQLITE_OK, let handle else {
-            throw DBError.openFailed(code: rc, message: String(cString: sqlite3_errmsg(handle)))
+            let message: String
+            if let handle {
+                message = String(cString: sqlite3_errmsg(handle))
+            } else {
+                message = "Unknown SQLite open error"
+            }
+            throw DBError.openFailed(code: rc, message: message)
         }
         db = handle
     }

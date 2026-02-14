@@ -1,10 +1,18 @@
 import Foundation
-import Testing
+import XCTest
 @testable import MessageExporterApp
 
-@Test func jsonExportWritesFile() throws {
-    let tmp = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
-    let bundle = ExportBundle(conversation: .init(id: "c1", title: "Demo", participantHandles: [], lastPreview: nil, lastDate: nil, isGroup: false), messages: [])
-    try Exporter().exportJSON(bundle: bundle, to: tmp)
-    #expect(FileManager.default.fileExists(atPath: tmp.path))
+final class ExportTests: XCTestCase {
+    func testJSONExportWritesFile() throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".json")
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        let bundle = ExportBundle(
+            conversation: .init(id: "c1", sourceRowID: nil, title: "Demo", participantHandles: [], participantDisplayNames: [], lastPreview: nil, lastDate: nil, isGroup: false),
+            messages: []
+        )
+
+        try Exporter().exportJSON(bundle: bundle, to: url)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+    }
 }

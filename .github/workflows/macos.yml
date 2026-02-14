@@ -10,12 +10,24 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install xcodegen
+        run: brew install xcodegen
+      - name: Generate fixture DB
+        run: ./scripts/generate-synthetic-db.sh Resources/synthetic-chat.db
+      - name: Generate Xcode project
+        run: xcodegen generate
       - name: Set commit hash
         run: echo "GIT_COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-      - name: Build
+      - name: Build and Test (Xcode)
+        run: |
+          xcodebuild \
+            -project MessageExporterApp.xcodeproj \
+            -scheme MessageExporterApp \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            clean test
+      - name: Build (SwiftPM Release)
         run: swift build -c release
-      - name: Test
-        run: swift test
       - name: Create app bundle
         run: |
           mkdir -p .build/release/MessageExporterApp.app/Contents/MacOS
@@ -31,8 +43,50 @@ jobs:
             .build/release/MessageExporterApp.dmg
 
   sign-notarize:
-    if: ${{ secrets.APPLE_CERT_BASE64 != '' && secrets.APPLE_API_KEY != '' }}
+    if: ${{ secrets.APPLE_CERT_BASE64 != '' && secrets.APPLE_CERT_PASSWORD != '' && secrets.APPLE_TEAM_ID != '' && secrets.APPLE_ID != '' && secrets.APP_PASSWORD != '' && secrets.APPLE_SIGNING_IDENTITY != '' }}
     runs-on: macos-latest
     needs: build-test-package
     steps:
-      - run: echo "Signing/notarization is configured only when secrets are provided."
+      - uses: actions/checkout@v4
+      - name: Install xcodegen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build release app
+        run: |
+          xcodebuild \
+            -project MessageExporterApp.xcodeproj \
+            -scheme MessageExporterApp \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            clean build
+      - name: Import signing certificate
+        run: |
+          echo "$APPLE_CERT_BASE64" | base64 --decode > signing.p12
+          security create-keychain -p temp build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp build.keychain
+          security import signing.p12 -k build.keychain -P "$APPLE_CERT_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k temp build.keychain
+        env:
+          APPLE_CERT_BASE64: ${{ secrets.APPLE_CERT_BASE64 }}
+          APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
+      - name: Codesign app
+        run: |
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name MessageExporter.app | head -n 1)
+          codesign --force --timestamp --options runtime --sign "$APPLE_SIGNING_IDENTITY" "$APP_PATH"
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+      - name: Notarize app (optional)
+        run: |
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name MessageExporter.app | head -n 1)
+          ditto -c -k --keepParent "$APP_PATH" MessageExporter.zip
+          xcrun notarytool submit MessageExporter.zip \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APP_PASSWORD" \
+            --wait
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD }}

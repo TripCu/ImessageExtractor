@@ -25,7 +25,8 @@ struct ExportView: View {
             HStack {
                 Button("Cancel") { dismiss() }
                 Spacer()
-                Button("Export") { Task { await runExport() } }.disabled(exporting)
+                Button("Export") { Task { await runExport() } }
+                    .disabled(exporting || (format == .encrypted && passphrase.isEmpty))
             }
             if !status.isEmpty { Text(status).font(.caption) }
         }
@@ -42,21 +43,37 @@ struct ExportView: View {
         guard panel.runModal() == .OK, let url = panel.url else { return }
 
         let messages = await appState.dataStore.messages(for: conversation)
-        let bundle = ExportBundle(conversation: conversation, messages: messages)
+        let displayNames: [String]
+        if appState.resolveContactNames, appState.contactResolver.status() == .authorized {
+            displayNames = conversation.participantHandles.map { appState.contactResolver.resolve(handle: $0) }
+        } else {
+            displayNames = conversation.participantHandles
+        }
+
+        let conversationForExport = ConversationSummary(
+            id: conversation.id,
+            sourceRowID: conversation.sourceRowID,
+            title: conversation.title,
+            participantHandles: conversation.participantHandles,
+            participantDisplayNames: displayNames,
+            lastPreview: conversation.lastPreview,
+            lastDate: conversation.lastDate,
+            isGroup: conversation.isGroup
+        )
+        let bundle = ExportBundle(conversation: conversationForExport, messages: messages)
         let exporter = Exporter()
         do {
             switch format {
             case .text: try exporter.exportText(bundle: bundle, to: url)
             case .json: try exporter.exportJSON(bundle: bundle, to: url)
             case .sqlite: try exporter.exportSQLite(bundle: bundle, to: url)
-            case .encrypted:
-                let data = try JSONEncoder.pretty.encode(bundle)
-                let encrypted = try EncryptedPackage.encrypt(plaintext: data, passphrase: passphrase)
-                try encrypted.write(to: url, options: .withoutOverwriting)
+            case .encrypted: try exporter.exportEncrypted(bundle: bundle, passphrase: passphrase, to: url)
             }
             status = "Export completed."
+            AppLogger.info("Export", "Export completed")
         } catch {
             status = "Export failed: \(error.localizedDescription)"
+            AppLogger.error("Export", "Export failed: \(error.localizedDescription)")
         }
     }
 

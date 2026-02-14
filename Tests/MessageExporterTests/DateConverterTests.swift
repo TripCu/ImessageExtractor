@@ -1,8 +1,16 @@
-import Testing
+import XCTest
 @testable import MessageExporterApp
 
-@Test func appleEpochSeconds() {
-    let date = AppleDateConverter.convert(raw: 0)
-    #expect(date != nil)
-    #expect(Int(date!.timeIntervalSince1970) == 978307200)
+final class DateConverterTests: XCTestCase {
+    func testAppleEpochSeconds() {
+        let date = AppleDateConverter.convert(raw: 0)
+        XCTAssertNotNil(date)
+        XCTAssertEqual(Int(date?.timeIntervalSince1970 ?? 0), 978_307_200)
+    }
+
+    func testAppleEpochMicros() {
+        let date = AppleDateConverter.convert(raw: 1_000_000)
+        XCTAssertNotNil(date)
+        XCTAssertEqual(Int(date?.timeIntervalSince1970 ?? 0), 978_307_201)
+    }
 }
