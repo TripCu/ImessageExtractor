@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gc
 import json
 import os
 import shutil
@@ -9,6 +10,7 @@ import threading
 from dataclasses import dataclass
 from pathlib import Path
 
+from .crypto import build_manifest, encrypt_package, secure_erase
 from .errors import InvalidRequestError, ServiceBusyError
 from .models import ConversationThread, ExportRequest
 
@@ -42,15 +44,14 @@ class ExportService:
             elif request.format == "sqlite":
                 self._write_sqlite_export(destination, export_thread)
             elif request.format == "encrypted_package":
-                raise InvalidRequestError(
-                    "Encrypted package export is unavailable until crypto support is enabled"
-                )
+                self._write_encrypted_package(destination, export_thread, request)
             else:
                 raise InvalidRequestError("Unsupported export format")
 
             return ExportResult(output_path=destination, message_count=len(export_thread.messages))
         finally:
             self._export_lock.release()
+            gc.collect()
 
     def _resolve_destination(self, raw_path: Path, export_format: str, overwrite: bool) -> Path:
         if "\x00" in str(raw_path):
@@ -91,7 +92,7 @@ class ExportService:
     ) -> ConversationThread:
         export_thread = conversation.model_copy(deep=True)
 
-        if request.copy_attachments:
+        if request.copy_attachments and request.format != "encrypted_package":
             copied = self._copy_attachments(export_thread, destination)
             for message in export_thread.messages:
                 for attachment in message.attachments:
@@ -265,11 +266,77 @@ class ExportService:
             connection.close()
             os.chmod(destination, stat.S_IRUSR | stat.S_IWUSR)
 
+    def _write_encrypted_package(
+        self,
+        destination: Path,
+        conversation: ConversationThread,
+        request: ExportRequest,
+    ) -> None:
+        if not request.encrypt:
+            raise InvalidRequestError("encrypt must be true for encrypted_package format")
+        if not request.passphrase:
+            raise InvalidRequestError("passphrase is required for encrypted exports")
+
+        package_thread = conversation.model_copy(deep=True)
+        package_files: dict[str, bytes | bytearray] = {}
+
+        has_attachments = False
+        if request.copy_attachments:
+            for message in package_thread.messages:
+                for index, attachment in enumerate(message.attachments):
+                    if not attachment.path:
+                        continue
+                    source = Path(attachment.path).expanduser()
+                    if not source.exists() or not source.is_file():
+                        continue
+
+                    safe_name = Path(attachment.filename).name or f"attachment_{message.id}_{index}"
+                    internal_name = f"attachments/{message.id}_{index}_{safe_name}"
+                    package_files[internal_name] = bytearray(source.read_bytes())
+                    has_attachments = True
+                    if request.include_attachment_paths:
+                        attachment.path = internal_name
+                    else:
+                        attachment.path = None
+        elif not request.include_attachment_paths:
+            for message in package_thread.messages:
+                for attachment in message.attachments:
+                    attachment.path = None
+
+        package_files["transcript.json"] = bytearray(
+            json.dumps(
+                package_thread.model_dump(mode="json"),
+                ensure_ascii=False,
+                indent=2,
+            ).encode("utf-8")
+        )
+        package_files["manifest.json"] = bytearray(
+            build_manifest(
+                conversation_id=package_thread.id,
+                message_count=len(package_thread.messages),
+                transcript_name="transcript.json",
+                includes_attachments=has_attachments,
+            )
+        )
+
+        encrypted_payload = encrypt_package(package_files, request.passphrase)
+        encrypted_buffer = bytearray(encrypted_payload)
+        try:
+            self._secure_write_bytes(destination, bytes(encrypted_buffer))
+        finally:
+            secure_erase(encrypted_buffer)
+            for value in package_files.values():
+                if isinstance(value, bytearray):
+                    secure_erase(value)
+
     def _secure_write_text(self, destination: Path, content: str) -> None:
+        self._secure_write_bytes(destination, content.encode("utf-8"))
+
+    def _secure_write_bytes(self, destination: Path, content: bytes) -> None:
         flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC
         fd = os.open(destination, flags, 0o600)
         try:
-            os.write(fd, content.encode("utf-8"))
+            os.write(fd, content)
             os.fchmod(fd, stat.S_IRUSR | stat.S_IWUSR)
         finally:
             os.close(fd)
