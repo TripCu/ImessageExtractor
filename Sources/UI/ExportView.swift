@@ -39,7 +39,7 @@ struct ExportView: View {
         defer { exporting = false }
         let panel = NSSavePanel()
         panel.canCreateDirectories = true
-        panel.nameFieldStringValue = "conversation-\(conversation.id).\(extensionForFormat(format))"
+        panel.nameFieldStringValue = defaultExportFilename(for: format)
         guard panel.runModal() == .OK, let url = panel.url else { return }
 
         let messages = await appState.dataStore.messages(for: conversation)
@@ -71,6 +71,7 @@ struct ExportView: View {
             }
             status = "Export completed."
             AppLogger.info("Export", "Export completed")
+            dismiss()
         } catch {
             status = "Export failed: \(error.localizedDescription)"
             AppLogger.error("Export", "Export failed: \(error.localizedDescription)")
@@ -85,4 +86,24 @@ struct ExportView: View {
         case .encrypted: return "imexport"
         }
     }
+
+    private func defaultExportFilename(for format: ExportFormat) -> String {
+        let rawTitle = conversation.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let base = sanitizeFilename(rawTitle.isEmpty ? "conversation" : rawTitle)
+        let ts = Self.timestampFormatter.string(from: Date())
+        return "message_export_\(base)_\(ts).\(extensionForFormat(format))"
+    }
+
+    private func sanitizeFilename(_ input: String) -> String {
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_"))
+        let scalars = input.unicodeScalars.map { allowed.contains($0) ? Character($0) : "_" }
+        let string = String(scalars).replacingOccurrences(of: "__+", with: "_", options: .regularExpression)
+        return string.lowercased()
+    }
+
+    private static let timestampFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateFormat = "yyyyMMdd-HHmmss"
+        return df
+    }()
 }

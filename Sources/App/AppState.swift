@@ -4,9 +4,8 @@ import Foundation
 final class AppState: ObservableObject {
     @Published var setupCompleted: Bool
     @Published var showDiagnostics = false
-    @Published var privacyModeEnabled = true
     @Published var resolveContactNames = false
-    @Published var selectedConversationID: String?
+    @Published var selectedConversationKey: String?
 
     let defaults = UserDefaults.standard
     var dataStore: MessagesDataStore
@@ -14,13 +13,18 @@ final class AppState: ObservableObject {
     let diagnosticsStore = DiagnosticsStore()
 
     var selectedConversation: ConversationSummary? {
-        guard let id = selectedConversationID else { return nil }
-        return dataStore.conversations.first(where: { $0.id == id })
+        guard let key = selectedConversationKey else { return nil }
+        return dataStore.conversations.first(where: { $0.selectionKey == key })
     }
 
     init() {
         setupCompleted = defaults.bool(forKey: "setupCompleted")
-        resolveContactNames = defaults.bool(forKey: "resolveContactNames")
+        if defaults.object(forKey: "resolveContactNames") == nil {
+            resolveContactNames = true
+            defaults.set(true, forKey: "resolveContactNames")
+        } else {
+            resolveContactNames = defaults.bool(forKey: "resolveContactNames")
+        }
         dataStore = MessagesDataStore(diagnostics: diagnosticsStore)
         AppLogger.info("Startup", "App state initialized")
     }
@@ -36,9 +40,9 @@ final class AppState: ObservableObject {
     }
 
     func clearInvalidSelectionIfNeeded() {
-        guard let id = selectedConversationID else { return }
-        if !dataStore.conversations.contains(where: { $0.id == id }) {
-            selectedConversationID = nil
+        guard let key = selectedConversationKey else { return }
+        if !dataStore.conversations.contains(where: { $0.selectionKey == key }) {
+            selectedConversationKey = nil
         }
     }
 }

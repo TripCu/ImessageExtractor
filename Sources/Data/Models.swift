@@ -9,6 +9,13 @@ struct ConversationSummary: Identifiable, Hashable, Codable, Sendable {
     let lastPreview: String?
     let lastDate: Date?
     let isGroup: Bool
+
+    var selectionKey: String {
+        if let sourceRowID {
+            return "rowid:\(sourceRowID)"
+        }
+        return "id:\(id)"
+    }
 }
 
 struct MessageItem: Identifiable, Hashable, Codable, Sendable {

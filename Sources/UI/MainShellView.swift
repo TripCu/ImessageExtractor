@@ -27,26 +27,29 @@ struct MainShellView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(selection: $appState.selectedConversationID) {
+            List(selection: $appState.selectedConversationKey) {
                 ForEach(visibleConversations) { convo in
                     VStack(alignment: .leading, spacing: 2) {
                         Text(titleForConversation(convo)).lineLimit(1)
-                        Text(sidebarPreview(for: convo))
+                        Text(convo.lastPreview ?? "No preview")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
                     .contentShape(Rectangle())
-                    .tag(convo.id as String?)
+                    .tag(convo.selectionKey)
+                    .onTapGesture {
+                        appState.selectedConversationKey = convo.selectionKey
+                    }
                     .contextMenu {
                         Button("Export Conversation") {
-                            appState.selectedConversationID = convo.id
+                            appState.selectedConversationKey = convo.selectionKey
                             showExport = true
                         }
                     }
                     .onAppear {
                         if search.isEmpty,
-                           convo.id == visibleConversations.last?.id,
+                           convo.selectionKey == visibleConversations.last?.selectionKey,
                            appState.dataStore.canLoadMore {
                             Task { await appState.dataStore.loadMore() }
                         }
@@ -66,12 +69,6 @@ struct MainShellView: View {
                 ToolbarItem(placement: .automatic) {
                     Button("Export") { showExport = true }
                         .disabled(appState.selectedConversation == nil)
-                }
-                ToolbarItem(placement: .automatic) {
-                    Toggle(isOn: $appState.privacyModeEnabled) {
-                        Label("Privacy Mode", systemImage: appState.privacyModeEnabled ? "eye.slash" : "eye")
-                    }
-                    .toggleStyle(.switch)
                 }
                 ToolbarItem(placement: .automatic) {
                     Toggle("Resolve Contact Names", isOn: Binding(
@@ -135,18 +132,11 @@ struct MainShellView: View {
         }
     }
 
-    private func sidebarPreview(for conversation: ConversationSummary) -> String {
-        if appState.privacyModeEnabled {
-            return "Privacy Mode enabled"
-        }
-        return conversation.lastPreview ?? "No preview"
-    }
-
     private func titleForConversation(_ conversation: ConversationSummary) -> String {
         guard appState.resolveContactNames else {
             return conversation.title
         }
-        return resolvedTitles[conversation.id] ?? conversation.title
+        return resolvedTitles[conversation.selectionKey] ?? conversation.title
     }
 
     private func handleContactToggle(_ enabled: Bool) async {
@@ -190,7 +180,7 @@ struct MainShellView: View {
         for conversation in appState.dataStore.conversations {
             let resolved = conversation.participantHandles.map { appState.contactResolver.resolve(handle: $0) }
             if !resolved.isEmpty {
-                map[conversation.id] = resolved.prefix(3).joined(separator: ", ")
+                map[conversation.selectionKey] = resolved.prefix(3).joined(separator: ", ")
             }
         }
         resolvedTitles = map
@@ -211,17 +201,7 @@ struct ConversationDetailView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            if appState.privacyModeEnabled {
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(0..<10, id: \.self) { _ in
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(.regularMaterial)
-                            .frame(height: 20)
-                    }
-                }
-                .padding(.top, 10)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            } else if isLoading {
+            if isLoading {
                 ProgressView("Loading messages...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
@@ -244,7 +224,7 @@ struct ConversationDetailView: View {
             }
         }
         .padding()
-        .task(id: conversation.id) {
+        .task(id: conversation.selectionKey) {
             await loadMessages()
         }
     }

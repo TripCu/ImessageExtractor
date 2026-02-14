@@ -205,20 +205,35 @@ final class MessagesDataStore: ObservableObject {
             throw DataStoreQueryError.unsupportedSchema(missing: probe.requiredMissing)
         }
 
-        let whereClause: String
+        var chatRowIDs: [Int64] = []
         if let rowID = conversation.sourceRowID {
-            whereClause = "c.ROWID = \(rowID)"
+            chatRowIDs = [rowID]
         } else {
             let escaped = conversation.id.replacingOccurrences(of: "'", with: "''")
-            whereClause = "c.guid = '\(escaped)' OR CAST(c.ROWID AS TEXT) = '\(escaped)'"
+            let chatRows = try db.queryRows(sql: """
+            SELECT ROWID AS rowid
+            FROM chat
+            WHERE guid = '\(escaped)' OR CAST(ROWID AS TEXT) = '\(escaped)';
+            """)
+            chatRowIDs = chatRows.compactMap { $0["rowid"]?.int64 }
         }
 
-        let senderSelect = (probe.messageColumns.contains("handle_id") && probe.tables.contains("handle") && probe.handleColumns.contains("id")) ? "h.id" : "NULL"
-        let senderJoin = (probe.messageColumns.contains("handle_id") && probe.tables.contains("handle") && probe.handleColumns.contains("id")) ? "LEFT JOIN handle h ON h.ROWID = m.handle_id" : ""
+        guard !chatRowIDs.isEmpty else { return [] }
+        let rowIDList = chatRowIDs.map(String.init).joined(separator: ",")
+
+        let senderSelect: String
+        let senderJoin: String
+        if probe.messageColumns.contains("handle_id"), probe.tables.contains("handle"), probe.handleColumns.contains("id") {
+            senderSelect = "h.id"
+            senderJoin = "LEFT JOIN handle h ON h.ROWID = m.handle_id"
+        } else {
+            senderSelect = "NULL"
+            senderJoin = ""
+        }
         let attributedSelect = probe.messageColumns.contains("attributedBody") ? "m.attributedBody" : "NULL"
 
         let rows = try db.queryRows(sql: """
-        SELECT
+        SELECT DISTINCT
           COALESCE(m.guid, CAST(m.ROWID AS TEXT)) AS id,
           m.ROWID AS message_rowid,
           m.date AS date,
@@ -228,11 +243,10 @@ final class MessagesDataStore: ObservableObject {
           \(senderSelect) AS sender
         FROM message m
         JOIN chat_message_join cmj ON cmj.message_id = m.ROWID
-        JOIN chat c ON c.ROWID = cmj.chat_id
         \(senderJoin)
-        WHERE \(whereClause)
-        ORDER BY m.date ASC
-        LIMIT 10000;
+        WHERE cmj.chat_id IN (\(rowIDList))
+        ORDER BY m.date ASC, m.ROWID ASC
+        ;
         """)
 
         var result: [MessageItem] = []
