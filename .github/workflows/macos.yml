@@ -8,9 +8,6 @@ on:
 jobs:
   build-test-package:
     runs-on: macos-latest
-    defaults:
-      run:
-        working-directory: macos-app
     steps:
       - uses: actions/checkout@v4
       - name: Set commit hash
@@ -30,8 +27,8 @@ jobs:
         with:
           name: MessageExporter-macos
           path: |
-            macos-app/.build/release/MessageExporterApp
-            macos-app/.build/release/MessageExporterApp.dmg
+            .build/release/MessageExporterApp
+            .build/release/MessageExporterApp.dmg
 
   sign-notarize:
     if: ${{ secrets.APPLE_CERT_BASE64 != '' && secrets.APPLE_API_KEY != '' }}

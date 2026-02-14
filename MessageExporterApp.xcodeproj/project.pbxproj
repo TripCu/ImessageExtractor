@@ -1,0 +1,629 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		016DB10B24F89703D81386EE /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0470B88543810A5A9F751F76 /* Exporter.swift */; };
+		03C8299A436412BFA9D5FF44 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482E06603126EF57C1EE2C85 /* AppState.swift */; };
+		0BA3B4D9FE921B216EF9D88C /* SQLiteReadOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3234024E279F6E31D3646 /* SQLiteReadOnly.swift */; };
+		1659BE1751E68C044CBE72F8 /* ExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6140F436A7F1320027920C /* ExportTests.swift */; };
+		26E59BB739FC5B7FB15B088E /* MainShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B77D7320BCD51804B3EF0AF /* MainShellView.swift */; };
+		36A7EDFD1357199781286B31 /* SetupWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB75AED5491B7B468D4EFE24 /* SetupWizardView.swift */; };
+		41FBC17B1189F4EB730716D5 /* DateConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B181A88F7858B5F6B19EB8 /* DateConverterTests.swift */; };
+		6B9300E1320DB393226459B4 /* SchemaProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB0E7DD3E77AFE7FD103A31 /* SchemaProbe.swift */; };
+		74287DD0F1996FD7EF469676 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7A940980A38B6CDFC79753 /* ExportView.swift */; };
+		7829E1F3B1BA2084BC4718CF /* EncryptedPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9A81A90CC73C2EB1AFDEBC /* EncryptedPackage.swift */; };
+		86EE7C620FCCED27F5441708 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F84AE980AF01B9EA3935161 /* AppLogger.swift */; };
+		875C20C4D8C61E6AE6382E2A /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CEACB21FF0373E476182767 /* Models.swift */; };
+		8A797D56E6188AE9C660FACD /* DiagnosticsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1715957990B020278DABA43 /* DiagnosticsStore.swift */; };
+		921931C2C693FA7D21167208 /* EncryptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37CA57C90D5E17E02770A70B /* EncryptionTests.swift */; };
+		A381825B29FD142A14DC9750 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 814582D22A541E5092FE910C /* RootView.swift */; };
+		A6A8DBF2298DF52738041EC9 /* DiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A3127D60514A2D8CC49C51 /* DiagnosticsView.swift */; };
+		A70EC73EDDDC3FB440C04A2B /* ContactResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8342ECF4A12EB3992CCCF324 /* ContactResolver.swift */; };
+		BBA30CAC8B513B46C82BA0F4 /* MessagesDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE70FBD1F624E5CEBDD0B607 /* MessagesDataStore.swift */; };
+		CBC9E9235DF4A76F19EB9436 /* MessageExporterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8CF8269FAB9F528CB4BE9B /* MessageExporterApp.swift */; };
+		CC48C1495528EFD3CE5A3BEC /* SchemaProbeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC644C275B4C31E6C4C66CA0 /* SchemaProbeTests.swift */; };
+		F48383CDC33BA1962E1CE310 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CA2D5F7397645110115757EE /* CryptoSwift */; };
+		F8F9EAABE8F8B42E4DA2E61C /* AppleDateConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A624621634BC4B1DBF1BB477 /* AppleDateConverter.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6445054FF95DC1EF72FDEC3E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EEEA9BECBADD9696A6E4E71C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 13DFEA0F7E25A67D012E0E61;
+			remoteInfo = MessageExporterApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0470B88543810A5A9F751F76 /* Exporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exporter.swift; sourceTree = "<group>"; };
+		11A3127D60514A2D8CC49C51 /* DiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsView.swift; sourceTree = "<group>"; };
+		18C3234024E279F6E31D3646 /* SQLiteReadOnly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteReadOnly.swift; sourceTree = "<group>"; };
+		21B181A88F7858B5F6B19EB8 /* DateConverterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateConverterTests.swift; sourceTree = "<group>"; };
+		2C8CF8269FAB9F528CB4BE9B /* MessageExporterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageExporterApp.swift; sourceTree = "<group>"; };
+		37CA57C90D5E17E02770A70B /* EncryptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptionTests.swift; sourceTree = "<group>"; };
+		482E06603126EF57C1EE2C85 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		4F84AE980AF01B9EA3935161 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		75AD4BAF10174ADD8CC85A49 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		7F9A81A90CC73C2EB1AFDEBC /* EncryptedPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedPackage.swift; sourceTree = "<group>"; };
+		814582D22A541E5092FE910C /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		8342ECF4A12EB3992CCCF324 /* ContactResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactResolver.swift; sourceTree = "<group>"; };
+		8B77D7320BCD51804B3EF0AF /* MainShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainShellView.swift; sourceTree = "<group>"; };
+		8CEACB21FF0373E476182767 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		A624621634BC4B1DBF1BB477 /* AppleDateConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleDateConverter.swift; sourceTree = "<group>"; };
+		AC6140F436A7F1320027920C /* ExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportTests.swift; sourceTree = "<group>"; };
+		BB3A1AD3E8EE8841B5B14420 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		BE259854DECB4C694A39EC83 /* MessageExporterApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MessageExporterApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD4FAAA8C892E819B273B303 /* MessageExporterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MessageExporterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE70FBD1F624E5CEBDD0B607 /* MessagesDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesDataStore.swift; sourceTree = "<group>"; };
+		DB75AED5491B7B468D4EFE24 /* SetupWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardView.swift; sourceTree = "<group>"; };
+		DC644C275B4C31E6C4C66CA0 /* SchemaProbeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaProbeTests.swift; sourceTree = "<group>"; };
+		DE7A940980A38B6CDFC79753 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
+		E1715957990B020278DABA43 /* DiagnosticsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsStore.swift; sourceTree = "<group>"; };
+		EDB0E7DD3E77AFE7FD103A31 /* SchemaProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaProbe.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		98CF0E29477F48DA7A068857 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F48383CDC33BA1962E1CE310 /* CryptoSwift in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		11207E960A014779B24A645D /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				CE70FBD1F624E5CEBDD0B607 /* MessagesDataStore.swift */,
+				8CEACB21FF0373E476182767 /* Models.swift */,
+				EDB0E7DD3E77AFE7FD103A31 /* SchemaProbe.swift */,
+				18C3234024E279F6E31D3646 /* SQLiteReadOnly.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		18F74C04BB417A36F02EE1F6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BE259854DECB4C694A39EC83 /* MessageExporterApp.app */,
+				CD4FAAA8C892E819B273B303 /* MessageExporterTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2A8042F1B2C3B92C08B855D4 = {
+			isa = PBXGroup;
+			children = (
+				AF3445AE719743E5778E7F38 /* Config */,
+				7BC364199F8C284C74BDA044 /* Sources */,
+				C2DCFCC1FDCD829B2D7A2481 /* Tests */,
+				18F74C04BB417A36F02EE1F6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		38B8969FE4040FF5935CEF6C /* MessageExporterTests */ = {
+			isa = PBXGroup;
+			children = (
+				21B181A88F7858B5F6B19EB8 /* DateConverterTests.swift */,
+				37CA57C90D5E17E02770A70B /* EncryptionTests.swift */,
+				AC6140F436A7F1320027920C /* ExportTests.swift */,
+				DC644C275B4C31E6C4C66CA0 /* SchemaProbeTests.swift */,
+			);
+			path = MessageExporterTests;
+			sourceTree = "<group>";
+		};
+		6A0E26D2D63E43027DA16AF8 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				7F9A81A90CC73C2EB1AFDEBC /* EncryptedPackage.swift */,
+				0470B88543810A5A9F751F76 /* Exporter.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
+		7BC364199F8C284C74BDA044 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				D21CF65732CE799DACB15518 /* App */,
+				11207E960A014779B24A645D /* Data */,
+				6A0E26D2D63E43027DA16AF8 /* Export */,
+				CF4637C85DABB2F8816FDC9A /* UI */,
+				9846E9578354BE4DDAA62A7A /* Utilities */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		9846E9578354BE4DDAA62A7A /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				A624621634BC4B1DBF1BB477 /* AppleDateConverter.swift */,
+				4F84AE980AF01B9EA3935161 /* AppLogger.swift */,
+				8342ECF4A12EB3992CCCF324 /* ContactResolver.swift */,
+				E1715957990B020278DABA43 /* DiagnosticsStore.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		AF3445AE719743E5778E7F38 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				75AD4BAF10174ADD8CC85A49 /* Debug.xcconfig */,
+				BB3A1AD3E8EE8841B5B14420 /* Release.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		C2DCFCC1FDCD829B2D7A2481 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				38B8969FE4040FF5935CEF6C /* MessageExporterTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		CF4637C85DABB2F8816FDC9A /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				11A3127D60514A2D8CC49C51 /* DiagnosticsView.swift */,
+				DE7A940980A38B6CDFC79753 /* ExportView.swift */,
+				8B77D7320BCD51804B3EF0AF /* MainShellView.swift */,
+				814582D22A541E5092FE910C /* RootView.swift */,
+				DB75AED5491B7B468D4EFE24 /* SetupWizardView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		D21CF65732CE799DACB15518 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				482E06603126EF57C1EE2C85 /* AppState.swift */,
+				2C8CF8269FAB9F528CB4BE9B /* MessageExporterApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		13DFEA0F7E25A67D012E0E61 /* MessageExporterApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 83F01CE0460CCE8697EB85B9 /* Build configuration list for PBXNativeTarget "MessageExporterApp" */;
+			buildPhases = (
+				81047F8C3D6EA4772EA20447 /* Embed Commit Hash */,
+				70571C5B98266C9F22D00C83 /* Sources */,
+				33AD6B3C2DAAD21183750D8B /* Include BuildInfo */,
+				98CF0E29477F48DA7A068857 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MessageExporterApp;
+			packageProductDependencies = (
+				CA2D5F7397645110115757EE /* CryptoSwift */,
+			);
+			productName = MessageExporterApp;
+			productReference = BE259854DECB4C694A39EC83 /* MessageExporterApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		60DB43ED651A34213D3C84E5 /* MessageExporterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 38BC31ABE59931A1729769DC /* Build configuration list for PBXNativeTarget "MessageExporterTests" */;
+			buildPhases = (
+				EBDACBC49C752DA70D86990E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FD6BA724FF6CF54F8E551EF5 /* PBXTargetDependency */,
+			);
+			name = MessageExporterTests;
+			packageProductDependencies = (
+			);
+			productName = MessageExporterTests;
+			productReference = CD4FAAA8C892E819B273B303 /* MessageExporterTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		EEEA9BECBADD9696A6E4E71C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					13DFEA0F7E25A67D012E0E61 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = E6074A9CF92E086B2AD62325 /* Build configuration list for PBXProject "MessageExporterApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 2A8042F1B2C3B92C08B855D4;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A4FDC400C3B1D7E6870C4870 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				13DFEA0F7E25A67D012E0E61 /* MessageExporterApp */,
+				60DB43ED651A34213D3C84E5 /* MessageExporterTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		33AD6B3C2DAAD21183750D8B /* Include BuildInfo */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Include BuildInfo";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ -f \"$DERIVED_FILE_DIR/BuildInfo.xcconfig\" ]; then\n  cat \"$DERIVED_FILE_DIR/BuildInfo.xcconfig\"\nfi\n";
+		};
+		81047F8C3D6EA4772EA20447 /* Embed Commit Hash */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Commit Hash";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "GIT_HASH=$(git -C \"$SRCROOT\" rev-parse --short HEAD 2>/dev/null || echo unknown)\necho \"GIT_COMMIT_HASH=$GIT_HASH\" > \"$DERIVED_FILE_DIR/BuildInfo.xcconfig\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		70571C5B98266C9F22D00C83 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				86EE7C620FCCED27F5441708 /* AppLogger.swift in Sources */,
+				03C8299A436412BFA9D5FF44 /* AppState.swift in Sources */,
+				F8F9EAABE8F8B42E4DA2E61C /* AppleDateConverter.swift in Sources */,
+				A70EC73EDDDC3FB440C04A2B /* ContactResolver.swift in Sources */,
+				8A797D56E6188AE9C660FACD /* DiagnosticsStore.swift in Sources */,
+				A6A8DBF2298DF52738041EC9 /* DiagnosticsView.swift in Sources */,
+				7829E1F3B1BA2084BC4718CF /* EncryptedPackage.swift in Sources */,
+				74287DD0F1996FD7EF469676 /* ExportView.swift in Sources */,
+				016DB10B24F89703D81386EE /* Exporter.swift in Sources */,
+				26E59BB739FC5B7FB15B088E /* MainShellView.swift in Sources */,
+				CBC9E9235DF4A76F19EB9436 /* MessageExporterApp.swift in Sources */,
+				BBA30CAC8B513B46C82BA0F4 /* MessagesDataStore.swift in Sources */,
+				875C20C4D8C61E6AE6382E2A /* Models.swift in Sources */,
+				A381825B29FD142A14DC9750 /* RootView.swift in Sources */,
+				0BA3B4D9FE921B216EF9D88C /* SQLiteReadOnly.swift in Sources */,
+				6B9300E1320DB393226459B4 /* SchemaProbe.swift in Sources */,
+				36A7EDFD1357199781286B31 /* SetupWizardView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EBDACBC49C752DA70D86990E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				41FBC17B1189F4EB730716D5 /* DateConverterTests.swift in Sources */,
+				921931C2C693FA7D21167208 /* EncryptionTests.swift in Sources */,
+				1659BE1751E68C044CBE72F8 /* ExportTests.swift in Sources */,
+				CC48C1495528EFD3CE5A3BEC /* SchemaProbeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FD6BA724FF6CF54F8E551EF5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 13DFEA0F7E25A67D012E0E61 /* MessageExporterApp */;
+			targetProxy = 6445054FF95DC1EF72FDEC3E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		2CB1529B83DE285DFB8B9E03 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.example.MessageExporterTests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MessageExporterApp.app/Contents/MacOS/MessageExporterApp";
+			};
+			name = Release;
+		};
+		442A0B78DA3BF4297C580C75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/MessageExporter.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MessageExporter;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Resolve participant names from local Contacts when enabled.";
+				INFOPLIST_KEY_NSSystemAdministrationUsageDescription = "Full Disk Access may be needed to read Messages data.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.example.MessageExporter;
+				PRODUCT_NAME = MessageExporter;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		46A07BF446FA8F79D4EF6DFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BB3A1AD3E8EE8841B5B14420 /* Release.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		50533AFA91DBD90F3C508AAE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 75AD4BAF10174ADD8CC85A49 /* Debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9B9BE34555756FFF2D711B5F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/MessageExporter.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = dSYM;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MessageExporter;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Resolve participant names from local Contacts when enabled.";
+				INFOPLIST_KEY_NSSystemAdministrationUsageDescription = "Full Disk Access may be needed to read Messages data.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.example.MessageExporter;
+				PRODUCT_NAME = MessageExporter;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F4261AEF3D92245A293831E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.example.MessageExporterTests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MessageExporterApp.app/Contents/MacOS/MessageExporterApp";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		38BC31ABE59931A1729769DC /* Build configuration list for PBXNativeTarget "MessageExporterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4261AEF3D92245A293831E0 /* Debug */,
+				2CB1529B83DE285DFB8B9E03 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		83F01CE0460CCE8697EB85B9 /* Build configuration list for PBXNativeTarget "MessageExporterApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				442A0B78DA3BF4297C580C75 /* Debug */,
+				9B9BE34555756FFF2D711B5F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E6074A9CF92E086B2AD62325 /* Build configuration list for PBXProject "MessageExporterApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				50533AFA91DBD90F3C508AAE /* Debug */,
+				46A07BF446FA8F79D4EF6DFB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A4FDC400C3B1D7E6870C4870 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CA2D5F7397645110115757EE /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A4FDC400C3B1D7E6870C4870 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = EEEA9BECBADD9696A6E4E71C /* Project object */;
+}

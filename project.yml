@@ -1,0 +1,98 @@
+name: MessageExporterApp
+options:
+  minimumXcodeGenVersion: 2.44.0
+  deploymentTarget:
+    macOS: '14.0'
+  createIntermediateGroups: true
+  groupSortPosition: top
+configs:
+  Debug: debug
+  Release: release
+configFiles:
+  Debug: Config/Debug.xcconfig
+  Release: Config/Release.xcconfig
+packages:
+  CryptoSwift:
+    url: https://github.com/krzyzanowskim/CryptoSwift.git
+    from: 1.9.0
+targets:
+  MessageExporterApp:
+    type: application
+    platform: macOS
+    deploymentTarget: '14.0'
+    sources:
+      - path: Sources
+    resources:
+      - path: Resources
+        excludes:
+          - "**/*.db"
+      - path: Resources/synthetic-chat.db
+        optional: true
+    dependencies:
+      - package: CryptoSwift
+        product: CryptoSwift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.example.MessageExporter
+        PRODUCT_NAME: MessageExporter
+        SWIFT_VERSION: 5.9
+        INFOPLIST_KEY_CFBundleDisplayName: MessageExporter
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        INFOPLIST_KEY_NSContactsUsageDescription: Resolve participant names from local Contacts when enabled.
+        INFOPLIST_KEY_NSSystemAdministrationUsageDescription: Full Disk Access may be needed to read Messages data.
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        ENABLE_HARDENED_RUNTIME: NO
+        CODE_SIGN_ENTITLEMENTS: Config/MessageExporter.entitlements
+        GENERATE_INFOPLIST_FILE: YES
+        MACOSX_DEPLOYMENT_TARGET: '14.0'
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+      configs:
+        Debug:
+          ENABLE_TESTABILITY: YES
+        Release:
+          ENABLE_HARDENED_RUNTIME: YES
+          SWIFT_OPTIMIZATION_LEVEL: "-O"
+          DEBUG_INFORMATION_FORMAT: dSYM
+          VALIDATE_PRODUCT: YES
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: RELEASE
+    preBuildScripts:
+      - name: Embed Commit Hash
+        script: |
+          GIT_HASH=$(git -C "$SRCROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)
+          echo "GIT_COMMIT_HASH=$GIT_HASH" > "$DERIVED_FILE_DIR/BuildInfo.xcconfig"
+        basedOnDependencyAnalysis: false
+    postCompileScripts:
+      - name: Include BuildInfo
+        script: |
+          if [ -f "$DERIVED_FILE_DIR/BuildInfo.xcconfig" ]; then
+            cat "$DERIVED_FILE_DIR/BuildInfo.xcconfig"
+          fi
+        basedOnDependencyAnalysis: false
+  MessageExporterTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: '14.0'
+    sources:
+      - path: Tests/MessageExporterTests
+    dependencies:
+      - target: MessageExporterApp
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: org.example.MessageExporterTests
+        SWIFT_VERSION: 5.9
+schemes:
+  MessageExporterApp:
+    build:
+      targets:
+        MessageExporterApp: all
+        MessageExporterTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - MessageExporterTests
+    archive:
+      config: Release
