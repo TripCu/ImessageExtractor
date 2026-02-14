@@ -91,7 +91,7 @@ export default function App(): JSX.Element {
               </div>
             </header>
             <main className="pane-content">
-              <FakeChatPane />
+              <FakeChatPane seed={selectedConversation?.id ?? "default"} showTodaySeparator />
             </main>
             <ComposerBar />
           </section>
