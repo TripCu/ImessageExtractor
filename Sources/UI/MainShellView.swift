@@ -66,6 +66,9 @@ struct MainShellView: View {
                     Button { appState.showDiagnostics = true } label: { Image(systemName: "info.circle") }
                 }
                 ToolbarItem(placement: .automatic) {
+                    Button { appState.showPermissionSettings = true } label: { Image(systemName: "gearshape") }
+                }
+                ToolbarItem(placement: .automatic) {
                     Button("Export") { showExport = true }
                         .disabled(appState.selectedConversation == nil)
                 }

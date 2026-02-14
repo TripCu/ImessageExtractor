@@ -102,6 +102,11 @@ cd /Users/trip/ImessageExtractor
 ```
 
 ## Troubleshooting
+The toolbar `gear` button opens `Permissions & Access` at any time with buttons to:
+- Grant Full Disk Access
+- Grant Contacts Access
+- Refresh live permission/schema status
+
 ### Full Disk Access required
 1. Launch the app.
 2. On first-run wizard, click `Grant Full Disk Access`.

@@ -10,6 +10,7 @@
 		016DB10B24F89703D81386EE /* Exporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0470B88543810A5A9F751F76 /* Exporter.swift */; };
 		03C8299A436412BFA9D5FF44 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482E06603126EF57C1EE2C85 /* AppState.swift */; };
 		0BA3B4D9FE921B216EF9D88C /* SQLiteReadOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C3234024E279F6E31D3646 /* SQLiteReadOnly.swift */; };
+		127EAB95FBFD8B31B5906B11 /* PermissionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0D2FA8948E2D38979E247EA /* PermissionSettingsView.swift */; };
 		1659BE1751E68C044CBE72F8 /* ExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC6140F436A7F1320027920C /* ExportTests.swift */; };
 		26E59BB739FC5B7FB15B088E /* MainShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B77D7320BCD51804B3EF0AF /* MainShellView.swift */; };
 		2BF9D49874709BE9A6261336 /* SystemSettingsLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B6481D2B51E35A470B0B73 /* SystemSettingsLink.swift */; };
@@ -66,6 +67,7 @@
 		C979D7CF9C350684A4715CA4 /* MessageTextDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTextDecoder.swift; sourceTree = "<group>"; };
 		CD4FAAA8C892E819B273B303 /* MessageExporterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MessageExporterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE70FBD1F624E5CEBDD0B607 /* MessagesDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesDataStore.swift; sourceTree = "<group>"; };
+		D0D2FA8948E2D38979E247EA /* PermissionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionSettingsView.swift; sourceTree = "<group>"; };
 		DB75AED5491B7B468D4EFE24 /* SetupWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupWizardView.swift; sourceTree = "<group>"; };
 		DC644C275B4C31E6C4C66CA0 /* SchemaProbeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaProbeTests.swift; sourceTree = "<group>"; };
 		DE7A940980A38B6CDFC79753 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 				11A3127D60514A2D8CC49C51 /* DiagnosticsView.swift */,
 				DE7A940980A38B6CDFC79753 /* ExportView.swift */,
 				8B77D7320BCD51804B3EF0AF /* MainShellView.swift */,
+				D0D2FA8948E2D38979E247EA /* PermissionSettingsView.swift */,
 				814582D22A541E5092FE910C /* RootView.swift */,
 				DB75AED5491B7B468D4EFE24 /* SetupWizardView.swift */,
 			);
@@ -338,6 +341,7 @@
 				6705C6D9EFE6C0718BAA2E02 /* MessageTextDecoder.swift in Sources */,
 				BBA30CAC8B513B46C82BA0F4 /* MessagesDataStore.swift in Sources */,
 				875C20C4D8C61E6AE6382E2A /* Models.swift in Sources */,
+				127EAB95FBFD8B31B5906B11 /* PermissionSettingsView.swift in Sources */,
 				A381825B29FD142A14DC9750 /* RootView.swift in Sources */,
 				0BA3B4D9FE921B216EF9D88C /* SQLiteReadOnly.swift in Sources */,
 				6B9300E1320DB393226459B4 /* SchemaProbe.swift in Sources */,

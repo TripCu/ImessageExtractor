@@ -19,6 +19,11 @@ struct RootView: View {
                 .environmentObject(appState)
                 .frame(minWidth: 720, minHeight: 520)
         }
+        .sheet(isPresented: $appState.showPermissionSettings) {
+            PermissionSettingsView()
+                .environmentObject(appState)
+                .frame(minWidth: 640, minHeight: 420)
+        }
     }
 }
 

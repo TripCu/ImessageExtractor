@@ -4,6 +4,7 @@ import Foundation
 final class AppState: ObservableObject {
     @Published var setupCompleted: Bool
     @Published var showDiagnostics = false
+    @Published var showPermissionSettings = false
     @Published var selectedConversationKey: String?
 
     let defaults = UserDefaults.standard
