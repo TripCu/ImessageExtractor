@@ -46,6 +46,15 @@ cd /Users/trip/ImessageExtractor
 swift build
 ```
 
+## Run (Important)
+Do not use `swift run` for normal usage because it launches without a macOS app bundle identifier and breaks permissions flow.
+
+Use:
+```bash
+cd /Users/trip/ImessageExtractor
+./scripts/run-app.sh release
+```
+
 ## Run Tests
 `XCTest` is the required framework for this project.
 

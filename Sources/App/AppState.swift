@@ -11,6 +11,12 @@ final class AppState: ObservableObject {
     var dataStore: MessagesDataStore
     let contactResolver = ContactResolver()
     let diagnosticsStore = DiagnosticsStore()
+    let bundleIdentifier = Bundle.main.bundleIdentifier
+
+    var hasValidBundleIdentifier: Bool {
+        guard let bundleIdentifier else { return false }
+        return !bundleIdentifier.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
     var selectedConversation: ConversationSummary? {
         guard let key = selectedConversationKey else { return nil }
@@ -26,8 +32,10 @@ final class AppState: ObservableObject {
             resolveContactNames = defaults.bool(forKey: "resolveContactNames")
         }
         dataStore = MessagesDataStore(diagnostics: diagnosticsStore)
-        if Bundle.main.bundleIdentifier == nil {
+        if !hasValidBundleIdentifier {
             AppLogger.error("Startup", "Missing bundle identifier. Launch from .app bundle for proper permissions.")
+        } else {
+            AppLogger.info("Startup", "Bundle identifier: \(bundleIdentifier ?? "unknown")")
         }
         AppLogger.info("Startup", "App state initialized")
     }

@@ -33,6 +33,14 @@ struct SetupWizardView: View {
     }
 
     private func runChecks() async {
+        guard appState.hasValidBundleIdentifier else {
+            dbStatus = .fail
+            schemaStatus = .fail
+            contactsStatus = .fail
+            statusMessage = "Invalid launch mode. Open the generated .app bundle from .build/release."
+            return
+        }
+
         do {
             let path = MessagesDataStore.resolveDBPath(useSynthetic: false)
             let db = try SQLiteReadOnly(path: path)
